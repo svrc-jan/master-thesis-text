@@ -1,2 +1,7 @@
 *.aux
 prace.synctex.gz
+prace.bcf
+prace.log
+prace.lol
+prace.bct
+prace.out
