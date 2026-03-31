@@ -1,8 +1,13 @@
 *.aux
-prace.synctex.gz
+pdfa.xmpi
+prace.bbl
 prace.bcf
+prace.blg
+prace.lof
 prace.log
 prace.lol
-prace.bct
+prace.lot
 prace.out
 prace.run.xml
+prace.synctex.gz
+prace.toc
