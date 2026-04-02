@@ -67,12 +67,12 @@
 		// 		"latexmk"
 		// 	]
 		// },
-		{
-			"name": "xelatex",
-			"tools": [
-				"xelatex"
-			]
-		},
+		// {
+		// 	"name": "xelatex",
+		// 	"tools": [
+		// 		"xelatex"
+		// 	]
+		// },
 		// {
 		// 	"name": "pdflatex ➞ biber ➞ pdflatex`×2",
 		// 	"tools": [
