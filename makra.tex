@@ -13,24 +13,24 @@
 
 %% Přepneme na českou sazbu, fonty Latin Modern a kódování češtiny
 \ifthenelse{\boolean{xetex}\OR\boolean{luatex}}
-   { % use fontspec and OpenType fonts with utf8 engines
-			\usepackage[english,slovak,czech]{babel}
-			\usepackage[autostyle,english=british,czech=quotes]{csquotes}
-			\usepackage{fontspec}
-			\defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
-   }
-   {
-			\usepackage[english,slovak,czech]{babel}
-			\usepackage{lmodern}
-			\usepackage[T1]{fontenc}
-			\usepackage{textcomp}
-			\usepackage[utf8]{inputenc}
-			\usepackage[autostyle,english=british,czech=quotes]{csquotes}
-	 }
+{ % use fontspec and OpenType fonts with utf8 engines
+	\usepackage[english,slovak,czech]{babel}
+	\usepackage[autostyle,english=british,czech=quotes]{csquotes}
+	\usepackage{fontspec}
+	\defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+}
+{
+	\usepackage[english,slovak,czech]{babel}
+	\usepackage{lmodern}
+	\usepackage[T1]{fontenc}
+	\usepackage{textcomp}
+	\usepackage[utf8]{inputenc}
+	\usepackage[autostyle,english=british,czech=quotes]{csquotes}
+}
 \ifluatex
-\makeatletter
-\let\pdfstrcmp\pdf@strcmp
-\makeatother
+	\makeatletter
+	\let\pdfstrcmp\pdf@strcmp
+	\makeatother
 \fi
 
 \usepackage[a-2u]{pdfx}     % výsledné PDF bude ve standardu PDF/A-2u
@@ -181,16 +181,12 @@
 \hypersetup{hidelinks}
 %% odkazy barevně
 %% links in color
-\hypersetup{colorlinks=true,urlcolor=blue}
+% \hypersetup{colorlinks=true,urlcolor=blue}
 %% odkazy černě
 %% links in black
-%% \hypersetup{colorlinks=true,allcolors=black} 
+\hypersetup{colorlinks=true,allcolors=black}
 
-\renewcommand{\UrlBreaks}{\do\/\do\=\do\+\do\-\do\_\do\ \do\a\do\b\do\c\do\d%
-\do\e\do\f\do\g\do\h\do\i\do\j\do\k\do\l\do\m\do\n\do\o\do\p\do\q\do\r\do\s%
-\do\t\do\u\do\v\do\w\do\x\do\y\do\z\do\A\do\B\do\C\do\D\do\E\do\F\do\G\do\H%
-\do\I\do\J\do\K\do\L\do\M\do\N\do\O\do\P\do\Q\do\R\do\S\do\T\do\U\do\V\do\W%
-\do\X\do\Y\do\Z\do\1\do\2\do\3\do\4\do\5\do\6\do\7\do\8\do\9\do\0}
+\renewcommand{\UrlBreaks}{\do\/\do\=\do\+\do\-\do\_\do\ \do\a\do\b\do\c\do\d\do\e\do\f\do\g\do\h\do\i\do\j\do\k\do\l\do\m\do\n\do\o\do\p\do\q\do\r\do\s\do\t\do\u\do\v\do\w\do\x\do\y\do\z\do\A\do\B\do\C\do\D\do\E\do\F\do\G\do\H\do\I\do\J\do\K\do\L\do\M\do\N\do\O\do\P\do\Q\do\R\do\S\do\T\do\U\do\V\do\W\do\X\do\Y\do\Z\do\1\do\2\do\3\do\4\do\5\do\6\do\7\do\8\do\9\do\0}
 \urlstyle{tt}
 
 %%% Prostředí pro sazbu kódu, případně vstupu/výstupu počítačových

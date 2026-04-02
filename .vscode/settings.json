@@ -1,6 +1,7 @@
 {
 	"editor.wordWrap": "on",
 	"explorer.excludeGitIgnore": true,
+	"latex.linter.enabled" : false,
 	"latex-workshop.view.pdf.viewer": "tab",
 	"latex-workshop.latex.tools": [
 		{	
@@ -84,7 +85,7 @@
 		// 	]
 		// },
 		{
-			"name": "xelatex ➞ biber ➞ xelatex`×2",
+			"name": "xelatex ➞ biber ➞ xelatex",
 			"tools": [
 				"xelatex",
 				"biber",

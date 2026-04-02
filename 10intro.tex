@@ -1,16 +1,29 @@
-\chapter{Introduction}
+\chapter{Introduction}\label{chap:intro}
 
 \section{Motivation}
 
-Railway transpotation remains relevent even after its over 200 year history due to its efficiency, safety, and sustainability, however the most limiting factor has always been the use of the required infrastructure. As such the critical problem is always been scheduling. The complexity of this problem is increasing with size and intricacy of the railway system as well as the demand to use it. 
+Railway transpotation remains relevent even after its long history due to its efficiency, safety, and sustainability, however the most limiting factor has always been the use of the required infrastructure. As such the critical problem to utilize the railway effectively has always been scheduling. The complexity of this problem is continously increasing with size and intricacy of the railway system as well as the demand to use it. 
 
-Traditionally scheduling was done manually by humans, only with the advancements of optimizing algorithms and computational power are humans aided by computers. This still produces a static schedule that might be unusable if a disruption occurs. This is where train dispatching comes to play where the decisions are done in real-time, managing delays and conflics as they happen - this part is often still only done by humans.
+Traditionally scheduling was done manually by humans, only with the advancements of optimizing algorithms and computational power are humans aided by computers. This still produces a static schedule that might be unusable if a disruption occurs. This is where train dispatching comes to play where the decisions are done in real-time, managing delays and conflics as they happen - this part is often still only done by humans and provides a challenge for optimization algorithms as they need to find acceptable solution in the matter of minutes.
 
+\section{Goals}
 The main goal of this thesis is to develop a heuristic that is capable of train dispatching in real-time with intepretable results - a human should be able to understand the structure of the result to verify its validity.
 
-The heuristic will be evaluted \emph{DISPLIB: Train Dispatching benchmark library} {\cite{kloster2025displiblibrarytraindispatching}} consiting of train dispatching problem instances from real world data.
+The heuristic will be evaluted on the \emph{DISPLIB\@: Train Dispatching benchmark library}~\cite{kloster2025displiblibrarytraindispatching} consiting of train dispatching problem (TDP)instances from real world data. This library of instances was introduced for an optimization competition.
+
+A significant part of this thesis is focused on the decomposition of the problem as presented in the \emph{DISPLIB}. This is the main inovation which allows us to use a top-down approach, reducing the problem into smaller parts and solving the conflics in the subproblems, as opposed to the bottom-up approach, building up the solutions by resolving constrains sequentially, which is used by the winning solutions in the \emph{DISPLIB} competition.
 
 \section{Thesis structure}
 
-This thesis is 
+This thesis is structured in the following chapters with their contents:
+
+\begin{enumerate}
+	\item \hyperref[chap:intro]{\emph{Introduction}} - outlines the motivation, goals and structure of this thesis.
+	%\hyperref[chap:lit_rev]
+	\item {\emph{Literature review}} - review of the relevent literature separated into 3 parts. First is literature revelent to the \emph{DISPLIB}. Second are the most revelevant resources inspiring the heuristic or providing key theoretical ideas. Third is an overview of selected state of the art in scheduling optimization.
+	\item {\emph{Theoretical background}} - basic theory necessary for the description of the solutions. Main focus is on graph topology and the use of alternative and disjunctive graphs for scheduling models.
+	\item {\emph{Methodology}} - detailed description of the problem, decomposition and heuristic.
+	\item {\emph{Results}} - presentation of performance of the heuristic on the \emph{DISPLIB} instances.
+	\item {\emph{Conlusion}} - disussion of results and resume of main ideas presented in this thesis.
+\end{enumerate}
 
