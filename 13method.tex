@@ -1,1 +1,50 @@
 \chapter{Methodology}
+
+\section{Problem description}
+Most of the problem description is taken from the \emph{DISPLIB format specification} \cite{kloster2025displibspec}, a concise explanation is in accompanied paper \cite{kloster2025displiblibrarytraindispatching}.
+
+Each instance in the \emph{DISPLIB} library consist of set of trains and an objective to be minimized. All data is saved in JSON format \cite{pezoa2016foundations}. Train is defined by a DAG of operations, operation has the following content:
+
+\begin{itemize}
+    \item minimal duration: number
+    \item start lower bound: number
+    \item start upper bound: number (optional)
+    \item successors: list of operation indexes
+    \item required resources: list of resources
+    \begin{itemize}
+        \item resource name
+        \item release time
+    \end{itemize}
+\end{itemize}
+
+\begin{data}
+{     
+    "firstName": "John"
+    "lastName" : "Smith",
+    "age" : 25
+}
+\end{data}
+
+
+Each operation has a minimal duration, lower bound, optional upper bound, a list of successor operations, and a list of resources required by the operation with their release times. All operation DAGs have one entry (start) operation, with no predecessors, and one exit (end) operation, with no successors. Each operation ends exactly when the successor operation starts, exit operation has no end. 
+
+Resources are anything that is required by the operation, typically physical sections of the railway network. Resources can only be used by one operation at the time and are released after the end of the operation that uses it plus the defined release time.
+
+Objective is defined by a list of objectives components, each specified by the train and operation whose start is being used, a threshold value for the start and a coefficient for linear objective or increment for stepwise objective. The total objective $J$ is defined as a sum of components for active operations only,
+
+\begin{equation}
+J = \sum_{o \in O_{a,J}} c_o \max\{0, t_o - \bar{t}_o\} + d_o H(t_o - \bar{t}_o),
+\end{equation}
+
+where $O_{a,J}$ is a set of active operations that have an objective component, $t_o$ is start of the operation, $\bar{t}_o$ is the threshold for the operation, $c_o$ is the linear objective coefficient, $d_o$ is the stepwise objective increment, and $H(\cdot)$ is Heaviside step function \cite{abramowitz1972handbook}.
+
+Instances are contains:
+\begin{itemize}
+    \item list of operations
+    \item list of objective components
+\end{itemize}
+
+Operation contains:
+\begin{itemize}
+    \item minimal duration
+\end{itemize}
