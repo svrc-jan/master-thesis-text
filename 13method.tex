@@ -6,45 +6,72 @@ Most of the problem description is taken from the \emph{DISPLIB format specifica
 Each instance in the \emph{DISPLIB} library consist of set of trains and an objective to be minimized. All data is saved in JSON format \cite{pezoa2016foundations}. Train is defined by a DAG of operations, operation has the following content:
 
 \begin{itemize}
-    \item minimal duration: number
-    \item start lower bound: number
-    \item start upper bound: number (optional)
-    \item successors: list of operation indexes
-    \item required resources: list of resources
+    \item minimal duration
+    \item start lower bound
+    \item start upper bound (optional)
+    \item list of successors
+    \item list of required resources
     \begin{itemize}
         \item resource name
         \item release time
     \end{itemize}
-\end{itemize}
+\end{itemize}    
 
-\begin{data}
+Data \ref{data:op} show and example of an operation entry in the instance JSON.
+
+
+\begin{data}[float, caption={Example of operation entry in instance JSON}, label=data:op]
 {     
-    "firstName": "John"
-    "lastName" : "Smith",
-    "age" : 25
+    "start_lb": 10,
+    "start_ub": 50,
+    "min_duration": 5,
+    "resources": [
+        {
+            "resource": "R1"
+            "release_time": 0
+        }
+    ],
+    "successors": [
+        2,
+        3
+    ]
 }
 \end{data}
 
-
-Each operation has a minimal duration, lower bound, optional upper bound, a list of successor operations, and a list of resources required by the operation with their release times. All operation DAGs have one entry (start) operation, with no predecessors, and one exit (end) operation, with no successors. Each operation ends exactly when the successor operation starts, exit operation has no end. 
+All operation DAGs have one entry (start) operation, with no predecessors, and one exit (end) operation, with no successors. Each operation ends exactly when the successor operation starts, exit operation has no end. 
 
 Resources are anything that is required by the operation, typically physical sections of the railway network. Resources can only be used by one operation at the time and are released after the end of the operation that uses it plus the defined release time.
 
-Objective is defined by a list of objectives components, each specified by the train and operation whose start is being used, a threshold value for the start and a coefficient for linear objective or increment for stepwise objective. The total objective $J$ is defined as a sum of components for active operations only,
+Objective is defined by a list of objectives components, each with the following content 
+
+\begin{itemize}
+    \item train
+    \item operation
+    \item threshold
+    \item coefficient (linear objective)
+    \item increment (stepwise objective)
+\end{itemize}
+
+\begin{remark}
+While the format allows both coefficient and increment to be non-zero, in practice none of the instances mix both in one objective component.
+\end{remark}
+
+Data \ref{data:obj} show and example of an objective component entry in the instance JSON.
+
+\begin{data}[float, caption={Example of objective component in instance JSON}, label=data:obj]
+{     
+    "type": "op_delay",
+    "train": 0,
+    "operation": 5,
+    "threshold": 40,
+    "coefficient": 1
+}
+\end{data}
+
+The total objective $J$ is defined as a sum of components for active operations only,
 
 \begin{equation}
 J = \sum_{o \in O_{a,J}} c_o \max\{0, t_o - \bar{t}_o\} + d_o H(t_o - \bar{t}_o),
 \end{equation}
 
 where $O_{a,J}$ is a set of active operations that have an objective component, $t_o$ is start of the operation, $\bar{t}_o$ is the threshold for the operation, $c_o$ is the linear objective coefficient, $d_o$ is the stepwise objective increment, and $H(\cdot)$ is Heaviside step function \cite{abramowitz1972handbook}.
-
-Instances are contains:
-\begin{itemize}
-    \item list of operations
-    \item list of objective components
-\end{itemize}
-
-Operation contains:
-\begin{itemize}
-    \item minimal duration
-\end{itemize}

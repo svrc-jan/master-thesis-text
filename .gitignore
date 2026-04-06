@@ -1,6 +1,7 @@
 *.aux
 *.xmpi
 *.bbl
+*.bbl-SAVE-ERROR
 *.bcf
 *.blg
 *.lof

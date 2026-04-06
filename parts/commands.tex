@@ -24,19 +24,17 @@
 
 \newcounter{nalg}[chapter] % defines algorithm counter for chapter-level
 \renewcommand{\thenalg}{\thechapter .\arabic{nalg}} %defines appearance of the algorithm counter
+
 \DeclareCaptionLabelFormat{algocaption}{Algorithm \thenalg} % defines a new caption label as Algorithm x.y
-\DeclareCaptionLabelFormat{datacaption}{Data \thenalg} % defines a new caption label as Algorithm x.y
-
-
 \lstnewenvironment{algorithm}[1][] %defines the algorithm listing environment
 {   
     \refstepcounter{nalg} %increments algorithm number
     \captionsetup{labelformat=algocaption,labelsep=colon} %defines the caption setup for: it ises label format as the declared caption label above and makes label and caption text to be separated by a ':'
-    \lstset{ %this is the stype
+    \lstset{
         mathescape=true,
         frame=tB,
         % numbers=left, 
-        numberstyle=\tiny,
+        % numberstyle=\tiny,
         basicstyle=\small, 
         keywordstyle=\color{black}\bfseries\em,
         keywords={,input, output, return, datatype, function, is, in, if, else, foreach, while, for, begin, end, } %add the keywords you want, or load a language as Rubens explains in his comment above.
@@ -46,17 +44,29 @@
 }
 {}
 
+\colorlet{punct}{red!60!black}
+% \definecolor{background}{HTML}{EEEEEE}
+\definecolor{delim}{RGB}{20,105,176}
+% \colorlet{numb}{magenta!60!black}
+
+\colorlet{punct}{red!60!black}
+
+\DeclareCaptionLabelFormat{datacaption}{Data \thenalg} % defines a new caption label as Algorithm x.y
 \lstnewenvironment{data}[1][] %defines the algorithm listing environment
 {   
     \refstepcounter{nalg} %increments algorithm number
     \captionsetup{labelformat=datacaption,labelsep=colon} %defines the caption setup for: it ises label format as the declared caption label above and makes label and caption text to be separated by a ':'
     \lstset{ %this is the stype
-        frame=single,
-        framesep=3mm,
-    %    linenos=true,
-        xleftmargin=21pt,
-        tabsize=4
-        language=js
+        frame=tB,
+        basicstyle=\small\ttfamily,
+        literate=
+           *{:}{{{\color{punct}{:}}}}{1}
+            {,}{{{\color{punct}{,}}}}{1}
+            {\{}{{{\color{delim}{\{}}}}{1}
+            {\}}{{{\color{delim}{\}}}}}{1}
+            {[}{{{\color{delim}{[}}}}{1}
+            {]}{{{\color{delim}{]}}}}{1},
+        #1
     }
 }
 {}
