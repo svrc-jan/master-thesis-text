@@ -290,6 +290,13 @@ Each level $L$ consists of set of junctions $j \in L$ that are parallel and thus
   \outedges(L) = \bigcup_{j \in L} \outedges(j).
 \end{equation}
 
+Each operation also has a starting (source) level and ending (target) level based on its starting (source) and ending (target) junction,
+
+\begin{align}
+\src_{\mathrm{level}}(o) &= L \iff \src_{\mathrm{junct}}(o) \in L \\
+\tar_{\mathrm{level}}(o) &= L \iff \tar_{\mathrm{junct}}(o) \in L
+\end{align}
+
 The start (source) level contains only the start (source) junction, and the end (sink) level contains only the end (sink) junction.
 
 \subsubsection{Required and optional levels}
@@ -349,6 +356,11 @@ If operation $y$ is a successor of $x$ then $x$ is a predecessor of $y$,
 \end{equation}
 \end{remark}
 
+Activation $z_R$ of route $R$ is equal to activation of its operations $z_o$,
+\begin{equation}
+  z_R = z_o,\ \forall o \in R.
+\end{equation}
+
 \begin{figure}[htbp!]
 \caption{Junction graph and route graph}
 \label{fig:route}
@@ -360,29 +372,31 @@ If operation $y$ is a successor of $x$ then $x$ is a predecessor of $y$,
 
 This assignment of routes also generates a\ set of routing junctions (junction is routing if any route ends and/or begins there), each having a\ routing (flow) constraint
 \begin{equation}
-\sum_{r \in \rho_{\mathrm{in}}(j)} x_r - \sum_{r \in \rho_{\mathrm{out}}(j)} x_r = \begin{cases}
+\sum_{R \in \rho_{\mathrm{in}}(j)} z_R - \sum_{R \in \rho_{\mathrm{out}}(j)} z_R = \begin{cases}
     1 & \text{if $j$ is a\ start (source) junction} \\
     -1 & \text{if $j$ is an end (sink) junction} \\
     0 & \text{otherwise}
 \end{cases},
 \end{equation}
-where $x_r$ is a\ binary variable determining if route $r$ is used, $\sigma_{\mathrm{in}}(j)$ is a\ set of incoming routes and $\sigma_{\mathrm{in}}(j)$ is a\ set of outgoing routes for junction $j$.
+where $z_R$ is the activation of $R$, $\rho_{\mathrm{in}}(j)$ is a\ set of incoming routes and $\rho_{\mathrm{in}}(j)$ is a\ set of outgoing routes for junction $j$.
+
+For non-routing junctions, the constraint is redundant as it has only one incoming and one outgoing route which are the same.
 
 \subsubsection{Procedure}
 For each train we iterate over operations in topological order and assign them the same route if it is the only successor of its only predecessor, otherwise we create a\ new route. Procedure follows algorithm \ref{alg:route}.
 
 \begin{algorithm}[float=htbp!, caption={Route assignement}, label={alg:route}]
 input: operations $O = (o_0,\ \dots\ o_n)$ in topological order
-output: route assignment $r: O \rightarrow \mathbb{Z}_0^+$
+output: route assignment $R: O \rightarrow \mathbb{Z}_0^+$
 
 begin
   $k \gets 0$
   
   foreach $o \in O$
     if $\{p\} = \mathrm{pred}(o) \land \{o\} = \mathrm{succ}(p)$
-      $r(o) \gets r(p)$
+      $R(o) \gets R(p)$
     else
-      $r(o) \gets k$
+      $R(o) \gets k$
       $k \gets k + 1$
     end
   end
@@ -433,24 +447,25 @@ This is due to the nature of how we create the junctions in the first place. If 
 
 \subsubsection{Start and end levels}
 
-\begin{remark}
 The start level (source) and end level (sink) are always border levels,
 \begin{itemize}
   \item [(a)] The start level (source) and end level (sink) are always required.
-  \item [(b)] The start level (source) and end level (sink) have always one juncttionj the start (source) and end (sink) junction, respectively.
+  \item [(b)] The start level (source) and end level (sink) have always one junction, the start (source) and end (sink) junction, respectively.
   \item [(c)] There are no incoming operations for the start (source). The end (sink) has one incoming operation, the exit, which has no successor.
   \item [(d)] There are no outgoing operations for the end (source). The start (source) has one outgoing operation, the entry, which has no predecessor.
 \end{itemize}
-\end{remark}
+
 
 \subsubsection{Procedure}
+\begin{minipage}{\textwidth}
 \label{sec:proc_section}
 For each train we do the following:
 \begin{enumerate}
   \item Identify the border levels with the aforementioned conditions.
   \item Assign consecutive sections $(S_0,\ \dots,\ S_n)$ based on border levels.
-  \item Add all routes within the section (using operations' levels) to the specified section.
-\end{enumerate}
+  \item Add all routes $R$ within border levels (using its operations' levels) to the specified section $S \gets S \cup \{R\}$.
+\end{enumerate}  
+\end{minipage}
 
 \subsubsection{Example}
 
@@ -471,7 +486,7 @@ The goal is to merge the resource uses of the same resource for directly connect
 \begin{center}
 \includegraphics[width=.8\textwidth]{img/chunks.pdf}
 \end{center}
-\footnotesize \textit{Note:} Operations using the selected resource are red. (A) are chunks after directed merges, (B) is invalid chunk with reentry, (C) and (D) are valid chunks after parallel merges.
+\footnotesize \textit{Note:} Operations using the selected resource are red. (A) are chunks after direct merges, (B) is an invalid chunk with reentry, (C) and (D) are valid chunks after parallel merges.
 \end{figure}
 
 The (B) case in figure \ref{fig:chunks} shows an invalid chunk, where the operations on the top have a reentry of the same resource, thus they cannot be in the same chunk.
@@ -480,6 +495,14 @@ While direct merges might feel sufficient, in the following section \ref{sec:lin
 
 Each chunk $c = (r_c,\ O_c)$ is defined by the source $r_c$ and its set of operations $O_c$. We say that the chunk is active if any of the operations $o \in O_c$ are active. Each operation $o$ also has its set of chunk $C_o$, one chunk for each resource it requires.
 
+Chunk $c$ is active $z_c = 1$ if and only if any of the operations $o \in O_c$ are active,
+
+\begin{equation}
+  z_c = 1 \iff \exists o \in O_c,\ z_o = 1.
+\end{equation}
+
+The start of chunk is the start of its first active operation (this holds for start junction, level, and time). The end of the chunk is the end of its last active operation (this again holds for start junction, and level, end time is the end time of the last operation plus the release time for the resource).
+
 \subsubsection{Procedure}
 We apply the following procedure for each train separately and for each resource that is used by the train:
 \begin{enumerate}
@@ -487,11 +510,11 @@ We apply the following procedure for each train separately and for each resource
   \item Create a \emph{disjoint set} data structure like in section \ref{sec:junct} for each operation using resource $r$.
   \item For each operation union the sets of each predecessor and each successor with the operation of they share the same resource. These are the direct merges.
   \item Iterate over the pairs of disjunct sets $\{O_{a},\ O_{b}\}$ and check if any of the operations $y \in O_{b}$ are reachable from any operation in $x \in O_{a}$, and vice versa check if any of the operations $x \in O_{a}$ are reachable from any operation $y \in O_{b}$. If they are not reachable, union $O_{a}$ and $O_{b}$. These are the parallel merges. Note: This is an iterative procedure, the following checks to other chunks are done for the whole merged set of operations, $O_c = O_{a} \cup O_{b}$.
-  \item Assign each chunk $c = (r, O_c)$ its set of operations $O_c$ and add $c$ to the set of chunks $C_o$ for each operation $o \in C_o$.
+  \item Assign each chunk $c \gets (r, O_c)$ its set of operations $O_c$ and add $c$ to the set of chunks $C_o \gets C_o \cup \{c\}$ for each operation $o \in C_o$.
 \end{enumerate}
 
 \begin{remark}
-To check the reachability we use a simple breath first search \cite{moore1959shortest} from the starting set of operations that has a cutoff based on the maximum level of the target operations to reduce the search space.
+To check the reachability we use a simple breath first search (BFS) \cite{moore1959shortest} from the starting set of operations that has a cutoff based on the maximum level of the target operations to reduce the search space.
 \end{remark}
 
 
@@ -506,13 +529,13 @@ We will try to broaden the set of conditions that can be used to generate the st
 \subsection{Resource chunk links}
 Because of the blocking nature of resource use, where we need to acquire all the resources $r_{b},\ b \in C_{y} $ for the chunks $C_{y}$ of operation $y$ to transition from operation $x$ to $y$, and only then can we release the resources $r_{a},\ a \in C_{x}$, we say that the chunks $C_{x}$ are \emph{linked} to chunks $C_{y}$, so each chunk $a \in C_{x}$ has a forward link $f = (a,\ b)$ to each chunk $b \in C_{y}$, and each chunk $b \in C_{y}$ has a backward link $g = (b,\ a)$ to each chunk $a \in C_{x}$.
 
-Because each operation $o$ can have multiple chunks, we create both forward $f = (a, b)$ and backward $g = (b, a)$ for each pair of chunks $(a, b),\ \forall a,\ b \in C_o,\ a \neq b$, creating what we call a direct link as opposed to the aforementioned transition link.
+Each operation $o$ can have multiple chunks, so we create both forward $f = (a, b)$ and backward $g = (b, a)$ for each pair of chunks $(a, b),\ \forall a,\ b \in C_o,\ a \neq b$, creating what we call a direct link as opposed to the aforementioned transition link. The set of all forward links will create what we call the \emph{forward link graph} $\mathcal{F} = (C, F)$, the set of all backward links are what we call \emph{backward link graph} $\mathcal{G} = (C, G)$, where vertices are the chunks and edges are the links.
 
 \begin{remark}
 We keep track of forward links $F_c$ and backward links $G_c$ for each chunk $c$ separately, so we can have $(c, a) \in F_c$ and also $(c, a) \in G_c$ at the same time, which is the case for direct links on chunks on the same operation $o$, where $c, a \in C_o$. 
 \end{remark}
 
-It is important to note that the link is active if any of the transitions $(x, y)$ that create are active (both $x$ and $y$ are active), or it is direct link via the operation $o$ that is active. Figure \ref{fig:chunk_link} shows both a transition and a direct link example.
+It is important to note that the link is active if any of the transitions $(x, y)$ that create it are active (both $x$ and $y$ are active), or it is direct link via the operation $o$ that is active. Figure \ref{fig:chunk_link} shows both a transition and a direct link example.
 
 \begin{figure}[htbp!]
 \caption{Resource chunk link}
@@ -520,6 +543,138 @@ It is important to note that the link is active if any of the transitions $(x, y
 \begin{center}
 \includegraphics[width=.4\textwidth]{img/chunk_link.pdf}
 \end{center}
-\footnotesize \textit{Note:} Operations have their chunk sets. Chunks $a$ is blue, chunk $b$ is red. Transition link is at the top, direct link is at the bottom.
+\footnotesize \textit{Note:} Operations have their chunk sets. Chunk $a$ is blue, chunk $b$ is red. Transition link is at the top, direct link is at the bottom.
 \end{figure}
+
+\subsubsection{Conflicts and precedence}
+A conflict $k = \{c_m, c_n\}$ is a pair of chunks $c_n$ and $c_m$ on the same resource $r = r_{c_m} = r_{c_m}$ and for different trains $m = \mathrm{train}(c_m) < \mathrm{train}(c_n) = n$.\footnote{We select $n < m$ to clearly define which train is first based on the precedence.} We resolve each conflict by assigning precedence $p_k = 1 - \bar{p}_{k}$, meaning that if $p_k = 1$, the resource $r$ will be released by $c_m$ before it is acquired by $c_n$, if $\bar{p}_k = 1$, the resource $r$ will be released by $c_n$ before it is acquired by $c_m$.
+
+We can model this situation using alternative graph where each vertex is an event (junction or level), each edge is an operation and the alternative pair is the precedence decision. Figure \ref{fig:conflict} show the alternative graph for a conflict. By assign precedence $p_k = 1$, we select edge $(j_m,\ i_n)$ from the alternative pair $((j_m,\ i_n),\ (j_n,\ i_m))$ and vice versa.
+
+\begin{figure}[htbp!]
+\caption{Alternative graph for conflict}
+\label{fig:conflict}
+\begin{center}
+\includegraphics[width=.7\textwidth]{img/conflict.pdf}
+\end{center}
+\footnotesize \textit{Note:} Alternative edges are dotted. Chunks are in curly braces.
+\end{figure}
+
+\begin{remark}
+Without the information about the resources before and after the conflict, we cannot determine if the trains pass the resource in the same or opposite direction. This can be seen from \ref{fig:conflict} where both alternative graphs are equivalent.
+\end{remark}
+
+\subsubsection{Conflict links}
+Because the trains pass the chunks continuously and in the blocking manner, there are structural implication rules for precedence for conflicts on these neighboring chunks. This is discussed in \cite{dariano2008improving}, and we will paraphrase these rules here.
+
+There are 2 basic cases, trains going in the same (parallel) direction and trains going in the opposite direction. The first case was already shown in section \ref{sec:alt_graph}, but we will reiterate it here to show how the inferred selection in alterative graphs relates to the chunk precedence. The parallel case is shown in figure \ref{fig:conf_par}.
+
+
+\begin{figure}[htbp!]
+\caption{Conflict links - parallel case}
+\label{fig:conf_par}
+\begin{center}
+\includegraphics[width=.6\textwidth]{img/conf_par.pdf}
+\end{center}
+\footnotesize \textit{Note:} Alternative edges are dotted. Chunks are in curly braces. Conflicts distinguished by color.
+\end{figure}
+
+As we can see, the precedence $p_a \implies p_b$,\footnote{There is a slight abuse of notation where we use $p_{k_a} = p_a$.} because $(i_m, h_n) \implies (j_m,\ i_n)$ in the alternative graph. Similarly, $p_b \implies p_a$ for  $(j_m, i_n) \implies (i_m,\ h_n)$, so $(p_a \iff p_b) \equiv (p_a = p_b)$. Because the precedence decisions $p_a$ and $p_b$ imply each other, we say that conflicts $k_a$ and $k_b$ are linked.
+
+Similarly, we can also see from figure \ref{fig:conf_par} that $p_b = p_c$, so $k_b$ is linked to $k_c$. Because $k_a$ and $k_b$ are linked, and $k_b$ and $k_c$ are linked, we say that conflicts $k_a$, $k_b$ and $k_c$ form a conflict chain $\{k_a,\ k_b,\ k_c\}$, whose precedence decision are equal, meaning that for all of these conflicts and their chunks, either train $m$ or $n$ is first, they cannot change their order.
+
+The second case is the opposite direction case, where trains pass the resources in the opposite directions. This case is shown in figure \ref{fig:conf_opp}. Using the same logic as for the parallel case, we can see that $k_a$ and $k_b$ area linked, $p_a = p_b$, because $(i_m, j_n) \implies (j_m,\ i_n)$ and $(j_m,\ i_n) \implies (i_m, j_n)$. Again we can also see that $p_b = p_c$, so $k_a$, $k_b$, and $k_c$ form a chain for this case as well.
+
+\begin{figure}[htbp!]
+\caption{Conflict links - opposite case}
+\label{fig:conf_opp}
+\begin{center}
+\includegraphics[width=.6\textwidth]{img/conf_opp.pdf}
+\end{center}
+\footnotesize \textit{Note:} Alternative edges are dotted. Chunks are in curly braces. Conflicts distinguished by color.
+\end{figure}
+
+\subsubsection{Finding conflict links and chains}
+While the shown cases are trivial, in practice we do know which direction the trains are passing\footnote{Trains might also be parallel in one section and opposite in another section of the track.}, so we need to use the forward and backward link graphs $\mathcal{F}$ and $\mathcal{G}$ to figure out the direction.
+
+\begin{remark}
+The main motivation for the link graph was that finding the linked pairs of conflicts exhaustively was computationally expensive, and while the inferred selection conditions in the literature are theoretically sufficient, they were impractical to check for problems of the size in the DISPLIB.
+\end{remark}
+
+To find if there exists a link between 2 conflicts $k_a = (a_m,\ a_n)$ and $k_b = (b_m,\ b_n)$ we can check the link graphs for a matching chunk links. So conflicts $k_a$ and $k_b$ have a parallel link if either of the following conditions hold:
+\begin{itemize}
+  \item[(1)] Chunk $a_m$ has a forward link $(a_m,\ b_m) \in F_{a_m}$ and $a_n$ has a forward link $(a_n,\ b_n) \in F_{a_n}$.
+  \item[(2)] Chunk $a_m$ has a backward link $(a_n,\ b_m) \in G_{a_m}$ and $a_n$ has a backward link $(a_n,\ b_n) \in G_{a_n}$
+\end{itemize}
+
+Conflicts $k_a$ and $k_b$ can also have an opposite link if either of the following conditions hold:
+\begin{itemize}
+  \item[(3)] Chunk $a_m$ has a forward link $(a_m,\ b_m) \in F_{a_m}$ and $a_n$ has a backward link $(a_n,\ b_n) \in G_{a_n}$.
+  \item[(4)] Chunk $a_m$ has a backward link $(a_n,\ b_m) \in G_{a_m}$ and $a_n$ has a forward link $(a_n,\ b_n) \in F_{a_n}$
+\end{itemize}
+
+\begin{remark}
+Condition (1) and (2), and (3) and (4), respectively, are symmetric. This is because if chunk $a$ has a forward link $(a,\ b) \in F_a$, then chunk $b$ always has a backward link $(b,\ a) \in G_b$. 
+\end{remark}
+
+Using these conditions, we can use BFS of DFS to find the entire chain of conflicts from a specific conflict, either by selecting a subset of condition for a specific direction (parallel or opposite), or any condition to find linked precedence decisions.
+
+\subsection{Scheduling effects of conflict chains}
+Because trains cannot change order within the conflict chain, they have direct effects on the possible scheduling of trains to each resource. First we will cover parallel case. For 2 trains that have a parallel resource chain $\{k_a,\ k_b,\ k_c\}$ and on resources $a$, $b$ $c$, and operations on $a$ have a minimal duration of 2 units, on $b$ they have 1 unit and on $c$ they have 3 units, with the earliest possible scheduling the schedule diagram (similar to Gantt diagram) is shown in figure \ref{fig:par_schedule}.
+
+
+\begin{figure}[htbp!]
+\caption{Schedule diagram - parallel chain}
+\label{fig:par_schedule}
+\begin{center}
+\includegraphics[width=.45\textwidth]{img/par_schedule.pdf}
+\end{center}
+\footnotesize \textit{Note:} Trains distinguished by color. Gray interval is when bot
+\end{figure}
+
+If the trains had the earliest possible start for resource $a$ at 0, then the second train would be delayed by only 3 units. If we were to require that the first train is overtaken by the second one after $a$ and before $c$, we would need to break the conflict chain by removing the conflict $k_b$, therefore rerouting either train to not use its chunk for resource $b$. This overtaking situation is only good if the first train has a big gap before it is considered delayed (the threshold of the objective is high). Such schedule is shown in figure \ref{fig:sched_overtake}.
+
+
+\begin{figure}[htbp!]
+\caption{Schedule diagram - overtaking}
+\label{fig:sched_overtake}
+\begin{center}
+\includegraphics[width=.5\textwidth]{img/sched_overtake.pdf}
+\end{center}
+\footnotesize \textit{Note:} Trains distinguished by color. Gray is overlap of intervals for resource $b$ and $d$.
+\end{figure}
+
+Because of the no swapping rule, the opposite conflict chains have a much bigger impact on the scheduling. Figure \ref{fig:opp_schedule} shows the schedule diagrams for the 2 possible precedence cases. 
+
+\begin{figure}[htbp!]
+\caption{Schedule diagram - opposite chain}
+\label{fig:opp_schedule}
+\begin{center}
+\includegraphics[width=1.0\textwidth]{img/opp_schedule.pdf}
+\end{center}
+\footnotesize \textit{Note:} Trains distinguished by color.
+\end{figure}
+
+As we can see, the schedule of the second train to pass this chain has to be delayed until the first one passes it entirely. This holds for arbitrarily long opposite chains, where the second train needs to wait until the opposite train passes its last chunk before entering its first chunk.
+
+Furthermore, when looking at train routing from a safety perspective, an opposite conflict chain means that trains that are going in the opposite direction are sharing a continuous sequence of resources (usually corresponding to sections of the railway track) and a situation where the train breaks the schedule and enters the conflict chain before the other train leaves, then we would have a head on collision.
+
+\begin{remark}
+Conflict chains only impact the scheduling only if the affected trains want to pass it in the same time. If they pass the chain at different times then the precedence decision becomes trivial.
+\end{remark}
+
+Due to these reasons, we will attempt to break up these opposite conflict chains as much as possible when making routing decisions. If we want to allow the swap of priority on resources $a$ and $c$, we need to break the conflict chain by rerouting either train to not use its chunk for resource $b$. By doing this we allow the schedule shown in figure $\ref{fig:schedule_swap}$ where the priority is swapped. As you can see, the delay of the second train is entirely removed.
+
+\begin{figure}[htbp!]
+\caption{Schedule diagram - swapping}
+\label{fig:schedule_swap}
+\begin{center}
+\includegraphics[width=0.35\textwidth]{img/schedule_swap.pdf}
+\end{center}
+\footnotesize \textit{Note:} Trains distinguished by color.
+\end{figure}
+
+\begin{remark}
+While the trains in figure $\ref{fig:schedule_swap}$ have no overlapping intervals, we still need the resource $d$. If both trains were scheduled to $b$ then would not have a time collision, however they would still break the no-swapping requirements.
+\end{remark}
 

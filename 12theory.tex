@@ -1,6 +1,6 @@
 \chapter{Theoretical background}
 
-This chapter will cover the necessary theory used to formulate and solver our problem. Main focus will be on graph topology and alternative graphs and their relation to the train dispatching problem. 
+This chapter will cover the necessary theory used to formulate and solve our problem. Main focus will be on graph topology and alternative graphs and their relation to the train dispatching problem. 
 
 \section{Basic definitions}
 While some of these definitions may feel redundant, we will use them as an opportunity to establish the notation. Most of the definitions are paraphrased from \emph{Handbook of Graph Theory} \cite{gross2013handbook} with notation adjusted to ours.
@@ -37,7 +37,7 @@ As you can see in figure \ref{fig:graph_example}, digraph allows for parallel ed
 \begin{center}
 \includegraphics[width=.6\textwidth]{img/graph_example.pdf}
 \end{center}
-\footnotesize \textit{Note:} (A) is graph, (B) is directed graph, (C) is multigraph, and (D) id directed multigraph.
+\footnotesize \textit{Note:} (A) is graph, (B) is directed graph, (C) is multigraph, and (D) is directed multigraph.
 \end{figure}
 
 Since we will mostly be working with directed graph, to following definitions are tailored for directed graphs. The following definitions of operators also abuse the notation by omitting the specification of graph $G$, which will be included in the context of multiple graphs if necessary.
@@ -90,18 +90,18 @@ Directed acyclic graph (DAG) is directed graph that contains no cycles.
 \end{definition}
 
 \begin{definition}
-Topological order $O$ is a sequence of vertices in directed graph $O = (v_1,\ \dots,\ v_{|V|})$ such that $e = (v_j,\ v_j) \implies v_i \prec v_j$ ($i < j$, $v_i$ appears before $v_j$ in the sequence).
+Topological order $O$ is a sequence of vertices in a directed graph $O = (v_1,\ \dots,\ v_{|V|})$ such that $e = (v_j,\ v_j) \implies v_i \prec v_j$ ($i < j$, $v_i$ appears before $v_j$ in the sequence).
 \end{definition}
 
 \begin{theorem}
-Topological order can only be created for acyclic graphs.
+Topological order can only be created for directed acyclic graphs.
 \end{theorem}
 
 \begin{proof}
 By contradiction, for path starting at $u$ and ending at $v$, $u \prec v$ in the topological order, because for each $e = (x, y)$ in path, $x \prec y$ and ordering $\prec$ is transitive. For cycle $u$ and $v$ are in the same spot in the order, this is a contradiction.
 \end{proof}
 
-To detect a cycle and get a topological sort we use algorithm \ref{alg:toposort}, it is a combination of depths first search (DFS) for cycle detection and DFS for topological sorting \cite{CLRS2022}. It runs in $\mathrm{O}(|V| + |E|)$ time complexity with $\mathrm{O}(|V|)$ required space. It allows us to do both cycle detection and topological sort in one pass of DFS.
+To detect a cycle and get a topological sort we use algorithm \ref{alg:toposort}, it is a combination of depth first search (DFS) for cycle detection and DFS for topological sorting \cite{CLRS2022}. It runs in $\mathrm{O}(|V| + |E|)$ time complexity with $\mathrm{O}(|V|)$ required space. It allows us to do both cycle detection and topological sort in one pass of DFS.
 
 \begin{remark}
 Algorithm \ref{alg:toposort} uses binary operator $+$ for concatenation of sequences, so for $S_1 = (a,\ b),\ S_2=(c,\ d),\ S_1 + S_2 = (a,\ b,\ c,\ d)$.
@@ -153,11 +153,12 @@ end
 \FloatBarrier
 
 \section{Alternative graphs}
+\label{sec:alt_graph}
 
 Alternative graphs were introduced in \cite{MASCIS2002498}. They provide a very useful framework for modeling resource allocation problems with blocking. They are a generalization of disjunctive graphs \cite{roy1964problemes}.
 
 \begin{definition}
-Alternative graph is an ordered tuple $G = (V,\ E,\ A)$, where $V = \{v_1,\ \dots,\ v_{|V|}\}$ is a set of vertices, $E = \{e_1,\ \dots,\ e_{|E|}\}$ is a set edges $e = (u,\ v),\ u,\ v \in V$, and $A = \{a_1,\ \dots,\ a_{|A|}\}$ is a set of disjunctive (alternative) edge pairs $a = ((u,\ v),\ (x,\ y)),\ u,\ v,\ x,\ y \in V$.
+Alternative graph is an ordered tuple $G = (V,\ E,\ A)$, where $V = \{v_1,\ \dots,\ v_{|V|}\}$ is a set of vertices, $E = \{e_1,\ \dots,\ e_{|E|}\}$ is a set of edge $e = (u,\ v),\ u,\ v \in V$, and $A = \{a_1,\ \dots,\ a_{|A|}\}$ is a set of disjunctive (alternative) edge pairs $a = ((u,\ v),\ (x,\ y)),\ u,\ v,\ x,\ y \in V$.
 \end{definition}
 
 \begin{remark}
@@ -223,7 +224,7 @@ It is possible to have a partial consistent selection $P$ for which there exist 
 
 \subsection{Weighted graphs}
 
-To extend the descriptive ability of graphs to model problems we assign properties to vertices or edges. One of the most common one is to add weights to edges.
+To extend the descriptive ability of graphs to model problems we assign properties to vertices or edges. One of the most common ones is to add weights to edges.
 
 \begin{definition}
 Weighted directed graph is an ordered tuple $G = (V,\ E,\ w)$, where $V$ and $E$ are same as in digraph definition \ref{def:digraph}, and $w: E \rightarrow \mathbb{R}$ is an edge weight mapping.
@@ -231,7 +232,7 @@ Weighted directed graph is an ordered tuple $G = (V,\ E,\ w)$, where $V$ and $E$
 
 
 \begin{definition}
-Length $\mathrm{L}(\cdot)$ of path $P$ is the sum of the weights for each edge,
+Length $\mathrm{L}(\cdot)$ of path $P$ is the sum of the weights of each edge,
 \begin{equation}
 \mathrm{L}(P) = \sum_{e \in P} w_e
 \end{equation}
@@ -259,14 +260,14 @@ In our model, we will use weighted DAG we call an \emph{event graph}, where each
 
 
 \begin{figure}[htbp!]
-\caption{Event graph for 3 trains with shared resources}
+\caption{Event graph for three trains with shared resources}
 \label{fig:event_graph}
 \begin{center}
 \includegraphics[width=.6\textwidth]{img/event_graph.pdf}
 \end{center}
 \end{figure}
 
-The time of the event $x$ in the even graph can be calculated as the longest path from origin $o$ to $x$, $\mathrm{T}(x) = \mathrm{L_{max}}(o,\ x)$.
+The time of the event $x$ in the event graph can be calculated as the longest path from the origin $o$ to $x$, $\mathrm{T}(x) = \mathrm{L_{max}}(o,\ x)$.
 
 
 Finding all the paths from $o$ to each $x \in V$ would be very expensive, by DFS the complexity is exponential \cite{homer2011computability}.
@@ -277,7 +278,7 @@ First optimization is the use of Bellman principle \cite{light2024principle}\cit
 	\mathrm{T}(v) = \mathrm{L_{max}}(o,\ v) = \max_{u \in \inver(v)} \mathrm{L_{max}}(o,\ u) + w_{(u,\ v)}.
 \end{equation}
 
-This is principle is used by the Floyd-Warshall algorithm \cite{floyd1962algo} and Dijkstra's algorithm \cite{Dijkstra1959} which are used for finding the shortest paths for all pairs for vertices and from a select starting vertex respectively. Both of them could be adjusted to find the longest path within polynomial complexity, $\mathrm{O}({|V|}^3)$ for Floyd-Warshall and $\mathrm{O}((|V| + |E|)log|V|)$ for Dijkstra with binary heap.
+This principle is used by the Floyd-Warshall algorithm \cite{floyd1962algo} and Dijkstra's algorithm \cite{Dijkstra1959} which are used for finding the shortest paths for all pairs of vertices and from a select starting vertex respectively. Both of them could be adjusted to find the longest path within polynomial complexity, $\mathrm{O}({|V|}^3)$ for Floyd-Warshall and $\mathrm{O}((|V| + |E|)log|V|)$ for Dijkstra with binary heap.
 
 Since we already use algorithm \ref{alg:toposort} to detect a cycle, we can just process the time of the events in the topological order, because topological order guarantees that any predecessors are already processed.
 
@@ -285,7 +286,7 @@ Since we already use algorithm \ref{alg:toposort} to detect a cycle, we can just
 Critical path $\mathrm{CP}(\cdot)$ for vertex $v$ is the longest path from origin $o$ to $v$.
 \end{definition}
 
-Critical path  is limiting the earliest start of event $v$, delaying any event along this path will also delay the event $v$,
+Critical path limits the earliest start of event $v$, delaying any event along this path will also delay the event $v$,
 
 \begin{equation}
 	\mathrm{L}(\mathrm{CP}(v)) = \mathrm{T}(v).

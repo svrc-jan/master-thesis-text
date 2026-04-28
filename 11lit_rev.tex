@@ -1,7 +1,7 @@
 \chapter{Literature review}
 
 
-This chapter provides a review of the relevant literature separated into 3 parts. First is literature reverent to the \emph{DISPLIB}. Second are the most relevant resources inspiring the heuristic or providing key theoretical ideas. Third is an overview of selected state of the art in scheduling optimization.
+This chapter provides a review of the relevant literature separated into three parts. First is literature relevant to the \emph{DISPLIB}. Second are the most relevant resources inspiring the heuristic or providing key theoretical ideas. Third is an overview of selected state of the art in scheduling optimization.
 
 \section{DISPLIB}
 
@@ -17,17 +17,17 @@ The train dispatching problem (TDP) which this thesis is working with is present
 The instances are published with best known solutions (assumed with unlimited time), for the 10-minute computation time limit only the competition team rankings are presented, without overview of the actual solutions.
 
 \subsection{Competition and solutions}
-Part of the presentation of \emph{DISPLIB} was also the announcement of the competition for optimization using this library. The competition concluded at the Optimization and Decision Science Conference (ODS) 2025 where they presented the winners. Unfortunately the materials for the solutions are not available, and only one team wrote a paper about their solution. Still, we find essential to provide the reader with the description for other solutions, so the limited information from the book of abstracts for the ODS 2025 \cite{ods2025bookofabstracts} is summarized.
+Part of the presentation of \emph{DISPLIB} was also the announcement of the competition for optimization using this library. The competition concluded at the Optimization and Decision Science Conference (ODS) 2025 where they presented the winners. Unfortunately the materials for the solutions are not available, and only one team wrote a paper about their solution. Still, we find it essential to provide the reader with the description for other solutions. Consequently, the limited information from the book of abstracts for the ODS 2025 \cite{ods2025bookofabstracts} is summarized.
 
-The first place went to Carolin Scholl and Luka Stärk (DB Systel GmbH). Their solution is based on branch and bound inspired by Monte Carlo Tree Search \cite{DARIANO2007643}, prioritizing not only lower bound improvement but also search for feasible solutions. In each step of the tree they resolve the chronologically first conflict either by setting precedence to either of the trains on the conflicting resources or by rerouting either train if possible. This is a bottom-up approach, only adding the necessary constrains for current conflicts.
+The first place went to Carolin Scholl and Luka Stärk (DB Systel GmbH). Their solution is based on branch and bound inspired by Monte Carlo Tree Search \cite{DARIANO2007643}, prioritizing not only lower bound improvement but also search for feasible solutions. In each step of the tree they resolve the chronologically first conflict either by setting precedence to either of the trains on the conflicting resources or by rerouting either train if possible. This is a bottom-up approach, only adding the necessary constraints for current conflicts.
 
-The second place went to Openbus team (ETH Zürich) which published a description of their solution in \emph{Handling Conflicts in Microscopic Railway Timetabling at Scale: A Hybrid Approach}\footnote{This paper is not officially published, only a pre-print was available.} \cite{Dubach2025handling}. Their solution utilizes 2 distinct solvers which run in parallel. First one is a Logic-Based Benders Decomposition (LBBD) procedure \cite{Leutwiler2022logic} where a master mixed-integer programming (MIP) problem performs a selection of current available paths, slave satisfiability modulo theory (SMT) solver creates a feasible timetable if possible (without conflicts) and a subproblem detects conflicts and adds them SMT solver, which in turn adds cuts to the master problem to maintain feasibility. Figure \ref{fig:openbus_lbbd} show the diagram of the solver as presented in their poster. Second solver uses a simpler MIP representation which iteratively relaxes the bounds for conflicting resources and tightens the bounds for nonconflicting resources converging to a feasible solution. Both of these solvers use a bottom-up approach, after a bound tightening procedure is applied globally. The authors argue that both of these solvers exploit different instance structures and share their bounds to improve convergence.
+The second place went to the Openbus team (ETH Zürich) which published a description of their solution in \emph{Handling Conflicts in Microscopic Railway Timetabling at Scale: A Hybrid Approach}\footnote{This paper is not officially published, only a pre-print was available.} \cite{Dubach2025handling}. Their solution utilizes 2 distinct solvers which run in parallel. First one is a Logic-Based Benders Decomposition (LBBD) procedure \cite{Leutwiler2022logic} where a master mixed-integer programming (MIP) problem performs a selection of current available paths, slave satisfiability modulo theory (SMT) solver creates a feasible timetable if possible (without conflicts) and a subproblem detects conflicts and adds them to the SMT solver, which in turn adds cuts to the master problem to maintain feasibility. Figure \ref{fig:openbus_lbbd} shows the diagram of the solver as presented in their poster. Second solver uses a simpler MIP representation which iteratively relaxes the bounds for conflicting resources and tightens the bounds for nonconflicting resources converging to a feasible solution. Both of these solvers use a bottom-up approach, after a bound tightening procedure is applied globally. The authors argue that both of these solvers exploit different instance structures and share their bounds to improve convergence.
 
 \begin{figure}[htbp!]
 \caption{Openbus DISPLIB competition poster}
 \label{fig:openbus_lbbd}
 \begin{center}
-\includegraphics[width=.525\textwidth]{img/openbus_lbbd.png}
+\includegraphics[width=.4\textwidth]{img/openbus_lbbd.png}
 \end{center}
 
 \footnotesize \textit{Source:} ETH Zürich Research Collection \cite{Dubach2025poster}
@@ -35,7 +35,7 @@ The second place went to Openbus team (ETH Zürich) which published a descriptio
 
 The third place went to Venislav Steliyanov Varbanov (independent). This solution also uses an MIP model with a decomposition to reduce the number of time variables - this idea is also used by the heuristic in this thesis, inspired by the provided description. After this aggregation of time variables, the conflicts are again resolved sequentially, similarly to the other 2 solutions.
 
-We can see that while the winning solutions may differ in their model representation and optimization approach, and 2 of them use a certain level of aggregation, they have one thing in common - they resolve the conflicts sequentially, and thus they only need to consider the conflicts that arise in the current partial solution and therefore the number of constrains and variables necessary to prevent the conflicts stays limited.
+We can see that while the winning solutions may differ in their model representation and optimization approach, and 2 of them use a certain level of aggregation, they have one thing in common - they resolve the conflicts sequentially, and thus they only need to consider the conflicts that arise in the current partial solution and therefore the number of constraints and variables necessary to prevent the conflicts stays limited.
 
 \section{Theory and heuristics}
 
@@ -47,14 +47,16 @@ Referenced by the winning solution is \emph{A Branch and Bound Algorithm for Sch
 
 \emph{Improving Real-Time Train Dispatching: Models, Algorithms and Applications.} \cite[p. 84-85]{dariano2008improving} provides static implication rules for the alternative graph representation that can be used for inferred selection based on the structure of TDP.
 
-\emph{Railway scheduling problems and their decomposition} \cite{Strotmann2007} is thesis that show decomposition techniques that inspired the decomposition used in this thesis to split the global problem into small subgraphs using border operations and a global synchronizer to merge the solution from these subgraphs and deal with potention conflicts.
+\begin{minipage}{\textwidth}
+\emph{Railway scheduling problems and their decomposition} \cite{Strotmann2007} is a thesis that shows decomposition techniques for train scheduling. It inspired us to focus on the event graph used in this thesis and to separate the routing and conflict resolution problems.	
+\end{minipage}
 
 \section{State of the art}
 Because the description of the solutions that are directly connected to this thesis is limited, we provide the reader with an overview of the recent state-of-the-art solutions for closely related problems in train dispatching and scheduling.
 
 \emph{Optimizing train dispatching for the Union Pacific Railroad}~\cite{boccia2025optimizing} presents an automated dispatching system that is in use on a real rail network. It uses a decomposition of the problem and global synchronizer to resolve conflict. It is a prime example how optimization can improve real-life solutions.
 
-\emph{A Branch-and-Cut Algorithm for Scheduling Train Platoons in Urban Rail Networks}~\cite{chai2024branch} describes a mixed-integer linear problem (MILP) for scheduling of train platoons, problem where different vehicles are flexibly and dynamically coupled and decoupled.
+\emph{A Branch-and-Cut Algorithm for Scheduling Train Platoons in Urban Rail Networks}~\cite{chai2024branch} describes a mixed-integer linear problem (MILP) for scheduling of train platoons, a problem where different vehicles are flexibly and dynamically coupled and decoupled.
 
 Authors in \emph{Decentralized Multi-Agent Coordination for Real-Time Railway Traffic Management} \cite{damato2025decentralised} propose the use of another emerging idea - instead of central or area based decomposition schedulers, trains cooperate as separate agents to prevent conflicts and achieve efficient scheduling. This decentralized nature of cooperation has already been used on drone related problems with success \cite{HertJINTHW_paper}.
 
