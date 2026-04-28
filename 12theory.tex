@@ -32,11 +32,12 @@ As you can see in figure \ref{fig:graph_example}, digraph allows for parallel ed
 \end{remark}
 
 \begin{figure}[htbp!]
-\caption{Example of graph (A), digraph (B), multigraph (C) and directed multigraph (D)}
+\caption{Graph types}
 \label{fig:graph_example}
 \begin{center}
-\includegraphics[width=.7\textwidth]{img/graph_example.pdf}
+\includegraphics[width=.6\textwidth]{img/graph_example.pdf}
 \end{center}
+\footnotesize \textit{Note:} (A) is graph, (B) is directed graph, (C) is multigraph, and (D) id directed multigraph.
 \end{figure}
 
 Since we will mostly be working with directed graph, to following definitions are tailored for directed graphs. The following definitions of operators also abuse the notation by omitting the specification of graph $G$, which will be included in the context of multiple graphs if necessary.
@@ -166,11 +167,12 @@ We denote the alternative $\bar{e}$ to the edge $e$ from the disjunctive pair $a
 To illustrate the concept of alternative graphs, figure \ref{fig:alt_graph_example} shows an alterative graph with 3 disjunctive pairs.
 
 \begin{figure}[htbp!]
-\caption{Example of alternative graph}
+\caption{Alternative graph}
 \label{fig:alt_graph_example}
 \begin{center}
-\includegraphics[width=0.6\textwidth]{img/alt_graph_example.pdf}
+\includegraphics[width=0.5\textwidth]{img/alt_graph_example.pdf}
 \end{center}
+\footnotesize \textit{Note:} Alternative edges are dotted, alternative pairs grouped by color.
 \end{figure}
 
 \begin{definition}
@@ -188,11 +190,12 @@ Selection $S$ is consistent if graph $(V,\, E \cup S)$ does not contain a cycle.
 To illustrate the selection terms, figure \ref{fig:alt_graph_selection} shows different types of selections from on alternative graph from figure \ref{fig:alt_graph_example}.
 
 \begin{figure}[htbp!]
-\caption{Examples for partial inconsistent (A), partial consistent (B), complete inconsistent (C), and complete consistent (D) selections}
+\caption{Alternative graph with selections}
 \label{fig:alt_graph_selection}
 \begin{center}
-\includegraphics[width=1.0\textwidth]{img/alt_graph_selection.pdf}
+\includegraphics[width=.8\textwidth]{img/alt_graph_selection.pdf}
 \end{center}
+\footnotesize \textit{Note:} (A) is partial inconsistent, (B) is partial consistent, (C) is complete inconsistent, and (D) is complete consistent selection. Alternative edges are dotted, selected edges are full, alternative pairs grouped by color.
 \end{figure}
 
 \begin{definition}
@@ -208,11 +211,12 @@ It is possible to have a partial consistent selection $P$ for which there exist 
 
 
 \begin{figure}[htbp!]
-\caption{Examples of partial consistent selection without possible complete consistent selection}
+\caption{Partial consistent selection without possible complete consistent selection}
 \label{fig:alt_graph_infeasible}
 \begin{center}
-\includegraphics[width=.6\textwidth]{img/alt_graph_infeasible.pdf}
+\includegraphics[width=.5\textwidth]{img/alt_graph_infeasible.pdf}
 \end{center}
+\footnotesize \textit{Note:} Alternative edges are dotted, selected edges are full, alternative pairs grouped by color.
 \end{figure}
 
 \FloatBarrier
@@ -255,10 +259,10 @@ In our model, we will use weighted DAG we call an \emph{event graph}, where each
 
 
 \begin{figure}[htbp!]
-\caption{Examples of event graph for 3 trains with shared resources}
+\caption{Event graph for 3 trains with shared resources}
 \label{fig:event_graph}
 \begin{center}
-\includegraphics[width=.7\textwidth]{img/event_graph.pdf}
+\includegraphics[width=.6\textwidth]{img/event_graph.pdf}
 \end{center}
 \end{figure}
 
@@ -326,7 +330,7 @@ end
 
 \begin{table}[htbp!]
 \begin{center}
-\caption{Time and critical path edge for vertices in example from figure \ref{fig:event_graph}}\label{tab:time_crit}
+\caption{Time and critical path edge for vertices in event graph}\label{tab:time_crit}
 \begin{tabular}{lrc}
 \toprule
 vertex & T & CPE \\

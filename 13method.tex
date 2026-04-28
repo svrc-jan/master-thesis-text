@@ -19,7 +19,7 @@ Each instance in the \emph{DISPLIB} library consist of set of trains and an obje
 
 Data \ref{data:op} show and example of an operation entry in the instance JSON.
 
-All operation graphs have one entry (start) operation, with no predecessors, and one exit (end) operation, with no successors. Each operation ends exactly when the successor operation starts, exit operation has no end. 
+All operation graphs have one entry (start) operation, with no predecessors, and one exit (end) operation, with no successors. Each operation ends exactly when the successor operation starts (this is what we call a transition), exit operation has no end. 
 
 Resources are anything that is required by the operation, typically physical sections of the railway network. Resources can only be used by one operation at the time and are released after the end of the operation that uses it plus the defined release time.
 
@@ -180,14 +180,16 @@ Using cycles in event graph to detect resource swaps only works if all resource 
 To effectively model the problem we will aggregate the operations and resources from the initial problem into several interconnected structures.
 
 \subsection{Junctions}
+\label{sec:junct}
 First aggregation is what we call junctions, corresponding to a\ single event of one operation starting and one ending (except for starting and ending operations). Because we always want each operation to have single determined event for start and end, the junction graph is a\ directed multigraph, where each edge corresponds to an operation (as opposed to an operation graph where each operation was a\ vertex), figure \ref{fig:junction} shows and example of an operation graph with corresponding junction graph. We use the name junctions as conceptually, the operations converge and diverge in these points as do real tracks in railway junctions.
 
 \begin{figure}[htbp!]
-\caption{Operation graph (left) with corresponding junction graph (right)}
+\caption{Operation graph and junction graph}
 \label{fig:junction}
 \begin{center}
 \includegraphics[width=.8\textwidth]{img/junction.pdf}
 \end{center}
+ \textit{Note:} Operation graph is left, junction graph is right.
 \end{figure}
 
 Aside from more natural representation of using vertices as single events and edges as intervals, which translates to the events graphs, we also reduce the number of required vertices and edges, for the example in figure \ref{fig:junction}, it is from 9 vertices and 11 edges to 7 vertices and 9 edges, that is including the often redundant start and end events.
@@ -241,34 +243,42 @@ end
 
 
 \subsubsection{Procedure}
-The procedure to create the junctions is done for each train separately. For each operation of the train we use the union operation on each pair of successors (just consecutive pairs are sufficient due to the nature of the union operation), this makes sure that each operation end will correspond to one junction. Each set in the \emph{disjoint set} structure will then correspond to one junction where the elements of the set are the outgoing operations. We also create an additional junction to represent the end of the last (exit) operation with no outgoing operations.
-
-With this set of junctions, we can assign each operation its starting junction. The first (entry)operation starts at the start (source) junction with no incoming operations. We can assign the ending junction for an operation to the starting junction of its successors, thus also getting the set of incoming operations for each junction, the last operation ends at the additional end (sink) junction  with no outgoing operations.
+The procedure to create the junctions is done for each train separately.
+\begin{enumerate}
+  \item Create a disjoint set for each operation of the train.
+  \item For each operation $o$ we use the \emph{union} operation on each consecutive pair of successors $\{x\, y\},\ x,\ y \in \mathrm{succ}(o)$.
+  \item Each disjoint set of operations is a set of outgoing operations $\outedges(j)$ for junction $j$.
+  \item Add the end (sink) junction $j_{\mathrm{end}}$ that represents the end of the exit operation $o_{\mathrm{exit}}$ for the train, it has no outgoing operations.
+  \item Assign the source junction $\mathrm{s}_{\mathrm{junct}}(o) \gets j$ for each operation $o \in \outedges(j)$.
+  \item Assign the target junction $\mathrm{t}_{\mathrm{junct}}(o) \gets \mathrm{s}_{\mathrm{junct}}(x)$ to any of its successors $x \in \mathrm{succ}(o)$ (they all must have the same starting junction because of step 2.).
+  \item Assign the target junction $\mathrm{t}_{\mathrm{junct}}(o_{\mathrm{exit}}) \gets j_{\mathrm{end}}$ to the end (sink) junction of the train.
+  \item Assign each junction the set of incoming operation $\inedges(j) \gets \{o\ |\ \mathrm{t}_{\mathrm{junct}}(o)=j\}$.
+\end{enumerate}
 
 \subsubsection{Invalid transitions}
-We could have a possible situation where the set of outgoing operations for a junction $j$ is not equal to the set of successors for an incoming operation $o_{\mathrm{in}}$, $\outedges(j) \neq \mathrm{succ}(o_{\mathrm{in}})$, or vice versa the set of incoming operations for a junction $j$ is not equal to the set of predecessors for an outgoing operation $o_{\mathrm{out}}$, $\inedges(j) \neq \mathrm{pred}(o_{\mathrm{in}})$. This generates an invalid transition $(o_1, o_2)$, such that $o_1 \in \inedges(j)$ and $o_2 \in \outedges(j)$, but $o_2 \notin \mathrm{succ}(o_1)$ or $o_1 \notin \mathrm{pred}(o_2)$. This case is rare however and only affects a few instances, but should be checked when making routing decisions.
+We could have a possible situation where the set of outgoing operations for a junction $j$ is not equal to the set of successors for an incoming operation $o_{\mathrm{in}}$, $\outedges(j) \neq \mathrm{succ}(o_{\mathrm{in}})$, or vice versa the set of incoming operations for a junction $j$ is not equal to the set of predecessors for an outgoing operation $o_{\mathrm{out}}$, $\inedges(j) \neq \mathrm{pred}(o_{\mathrm{in}})$. This generates an invalid transition $(o_{\mathrm{in}}, o_{\mathrm{out}})$, such that $o_{\mathrm{in}} \in \inedges(j)$ and $o_{\mathrm{out}} \in \outedges(j)$, but $o_{\mathrm{out}} \notin \mathrm{succ}(o_{\mathrm{in}})$ or $o_{\mathrm{in}} \notin \mathrm{pred}(o_{\mathrm{out}})$. This case is rare and only affects a few instances, but should be checked when making routing decisions.
 
-An example of such invalid transition is in figure \ref{fig:junct_invalid}, where the transition (2, 3) in the third junction invalid.
+An example of such invalid transition is in figure \ref{fig:junct_invalid}, where the transition (2, 3) in the third junction is invalid.
 
 \begin{figure}[htbp!]
-\caption{Operation graph (left) and its corresponding junction graph (right) for invalid transition}
+\caption{Operation graph junction graph for invalid transition}
 \label{fig:junct_invalid}
 \begin{center}
 \includegraphics[width=.7\textwidth]{img/junction_invalid.pdf}
 \end{center}
-\footnotesize \textit{Note:} Junction with invalid transition (2, 3) is gray.
+ \textit{Note:} Operation graph is left, junction graph is right. Junction with invalid transition (2, 3) is gray.
 \end{figure}
 
 \subsection{Levels}
 Second is the aggregation to levels. We group parallel junctions to levels,\footnote{In \cite{Dubach2025handling} they call levels \emph{event clusters}, the level term was taken from Venislav Varbanov.} as junctions can be parallel. This is useful to reduce the number of required vertices for each train in the event graph. An example of a\ junction graph and its corresponding level graph is in figure \ref{fig:level}.
 
 \begin{figure}[htbp!]
-\caption{Junction graph (top) and its corresponding level graph (bottom)}
+\caption{Junction graph and its corresponding level graph}
 \label{fig:level}
 \begin{center}
 \includegraphics[width=.5\textwidth]{img/levels.pdf}
 \end{center}
-\footnotesize \textit{Note:} Optional levels are gray.
+\footnotesize \textit{Note:} Junction graph is at the top, level graph is at the bottom. Optional levels are gray.
 \end{figure}
 
 Each level $L$ consists of set of junctions $j \in L$ that are parallel and thus mutually exclusive. The incoming and outgoing set of operations for each level is the union of the incoming and outgoing operations of its junctions, respectively,
@@ -324,18 +334,31 @@ We apply algorithm \ref{alg:topogen} to each train separately. We also assign ea
 To get required levels, we first label all levels as required and then iterate over all operations and check which level it bypasses (if any), and mark those as optional.
 
 \subsection{Routes}
-Now that we have aggregated distinct operation start and end events into junctions and levels, we aggregate the routing decision into routes. Each route consists of set of operations such that if $o_1$ and $o_2$ are in the same route and $o_1$ is a\ predecessor of $o_2$ then, $o_1$ is the \emph{only} predecessor of $o_2$ and $o_2$ is the \emph{only} successor of $o_1$. This follows the train flow network definition in \cite{fuchs2025optimizing}. An example of how operations are grouped into routes is in figure \ref{fig:route}.
+Now that we have aggregated distinct operation start and end events into junctions and levels, we aggregate the routing decision into routes. Each route $R$ consists of set of operations such that if operations $x$ and $y$ are in the same route and $y$ is a\ successor of $x$ then, $x$ is the \emph{only} predecessor of $y$ and $y$ is the \emph{only} successor of $x$, and to reduce the number of routes we force the implication the other way as well,
+
+\begin{equation}
+  ((x \in R) \land (y \in R) \land (y \in \mathrm{succ}(x))) \iff ((\mathrm{succ}(x) = \{y\}) \land (\mathrm{pred}(y) = \{x\})).
+\end{equation}
+
+This follows the train flow network definition in \cite{fuchs2025optimizing}. An example of how operations are grouped into routes is in figure \ref{fig:route}.
+
+\begin{remark}
+If operation $y$ is a successor of $x$ then $x$ is a predecessor of $y$,
+\begin{equation}
+  y \in \mathrm{succ}(x) \iff x \in \mathrm{pred}(y).
+\end{equation}
+\end{remark}
 
 \begin{figure}[htbp!]
-\caption{Junction graph (top) and its corresponding route graph (bottom)}
+\caption{Junction graph and route graph}
 \label{fig:route}
 \begin{center}
 \includegraphics[width=.5\textwidth]{img/routes.pdf}
 \end{center}
-\footnotesize \textit{Note:} Non-routing junctions are gray.
+\footnotesize \textit{Note:} Junction graph is at the top and route graph is at the bottom. Non-routing junctions are gray.
 \end{figure}
 
-This assignment of routes also generates a\ set of routing junctions (junctions where any route ends or begins), each having a\ routing (flow) constraint
+This assignment of routes also generates a\ set of routing junctions (junction is routing if any route ends and/or begins there), each having a\ routing (flow) constraint
 \begin{equation}
 \sum_{r \in \rho_{\mathrm{in}}(j)} x_r - \sum_{r \in \rho_{\mathrm{out}}(j)} x_r = \begin{cases}
     1 & \text{if $j$ is a\ start (source) junction} \\
@@ -356,7 +379,7 @@ begin
   $k \gets 0$
   
   foreach $o \in O$
-    if $\{p\} = \mathrm{pred}(o) \land \{o\} = border\mathrm{succ}(p)$
+    if $\{p\} = \mathrm{pred}(o) \land \{o\} = \mathrm{succ}(p)$
       $r(o) \gets r(p)$
     else
       $r(o) \gets k$
@@ -370,7 +393,7 @@ end
 
 \subsection{Routing sections}
 \label{sec:sections}
-To separate what routing decisions are connected to each other and which are independent, we now group routes into sections. Each section starts and ends at a\ border level. Border levels are identified using logic in the procedure subsection. Example of a\ junction graph being split into sections is in figure \ref{fig:section}.
+To separate what routing decisions are connected to each other and which are independent, we now group routes into sections. Each section starts and ends at a\ border level. Border levels are identified using conditions in the following subsection. Example of a\ junction graph being split into sections is in figure \ref{fig:section}.
 
 \begin{figure}[htbp!]
 \caption{Junction graph with identified sections and levels}
@@ -382,21 +405,14 @@ To separate what routing decisions are connected to each other and which are ind
 \end{figure}
 
 
-
-\subsubsection{Procedure}
-\label{sec:proc_section}
-For each train we do the following:
-\begin{enumerate}
-  \item Identify the levels that all the following conditions and mark them as border levels:
-  \begin{enumerate}
-    \item The level is required.
-    \item All junctions $j \in L$ for level $L$ are routing junctions.
-    \item For all incoming operation $o_{\mathrm{in}} \in \inedges(L)$ of level $L$, the successor set of $o_{\mathrm{in}}$ is equal to the outgoing operation set of $L$, $\mathrm{succ}(o_{\mathrm{in}}) = \outedges(L)$.
-    \item For all outgoing operation $o_{\mathrm{out}} \in \outedges(L)$ of level $L$, the predecessor set of $o_{\mathrm{out}}$ is equal to incoming operation set of $L$, $\mathrm{pred}(o_{\mathrm{out}}) = \inedges(L)$.
-  \end{enumerate}
-  \item Assign consecutive sections $(S_0,\ \dots,\ S_n)$ based on border levels.
-  \item Add all routes within the section (using operation levels) to the specified section.
-\end{enumerate}
+\subsection{Border levels}
+Border level is a level that meets the following conditions:
+\begin{itemize}
+  \item[(a)] The level is required.
+  \item[(b)] All junctions $j \in L$ for level $L$ are routing junctions.
+  \item[(c)] For all incoming operation $o_{\mathrm{in}} \in \inedges(L)$ of level $L$, the successor set of $o_{\mathrm{in}}$ is equal to the outgoing operation set of $L$, $\mathrm{succ}(o_{\mathrm{in}}) = \outedges(L)$.
+  \item[(d)] For all outgoing operation $o_{\mathrm{out}} \in \outedges(L)$ of level $L$, the predecessor set of $o_{\mathrm{out}}$ is equal to incoming operation set of $L$, $\mathrm{pred}(o_{\mathrm{out}}) = \inedges(L)$.
+\end{itemize}
 
 Condition (a) ensures that each section starts and ends at a required level. Condition (b) ensures that we do not split a route by the border level. Conditions (c) and (d) ensures that any route from the level can be taken independently of which route was taken to the level and, vice versa, any route to the level can be taken independently of which route was taken from the level.
 
@@ -406,7 +422,7 @@ A sufficient set of conditions to replace conditions (c) and (d) is:
   \item The level has one junction.
   \item The single junction has no invalid transitions.
 \end{itemize}
-This is because of the nature of how we create the junctions in the first place. If a level $L$ has a single junction $j$, then $\inedges(L) = \inedges(j)$ and $\outedges(L) = \outedges(j)$, and there are no invalid transitions in this junction, then the following equations hold,
+This is due to the nature of how we create the junctions in the first place. If a level $L$ has a single junction $j$, then $\inedges(L) = \inedges(j)$ and $\outedges(L) = \outedges(j)$, and there are no invalid transitions in this junction, then the following equations hold,
 \begin{equation}
   \inedges(L) = \inedges(j) = \mathrm{pred}(o),\ \forall o \in \outedges(L),
 \end{equation}
@@ -420,12 +436,21 @@ This is because of the nature of how we create the junctions in the first place.
 \begin{remark}
 The start level (source) and end level (sink) are always border levels,
 \begin{itemize}
-  \item Condition (a): They are always required.
-  \item Condition (b): They always have on junction, start (source) or end (sink) junction.
-  \item Condition (c): There are no incoming operations for the start (source). The end (sink) has one incoming operation, the exit, which has no successor.
-  \item Condition (d): There are no outgoing operations for the end (source). The start (source) has one outgoing operation, the entry, which has no predecessor.
+  \item [(a)] The start level (source) and end level (sink) are always required.
+  \item [(b)] The start level (source) and end level (sink) have always one juncttionj the start (source) and end (sink) junction, respectively.
+  \item [(c)] There are no incoming operations for the start (source). The end (sink) has one incoming operation, the exit, which has no successor.
+  \item [(d)] There are no outgoing operations for the end (source). The start (source) has one outgoing operation, the entry, which has no predecessor.
 \end{itemize}
 \end{remark}
+
+\subsubsection{Procedure}
+\label{sec:proc_section}
+For each train we do the following:
+\begin{enumerate}
+  \item Identify the border levels with the aforementioned conditions.
+  \item Assign consecutive sections $(S_0,\ \dots,\ S_n)$ based on border levels.
+  \item Add all routes within the section (using operations' levels) to the specified section.
+\end{enumerate}
 
 \subsubsection{Example}
 
@@ -433,12 +458,68 @@ In example from figure \ref{fig:section} we can see that L1 satisfies conditions
 
 We can also see that L3 satisfies conditions (a), (c), and (d), but again, its junction is non-routing, so  (b) is not satisfied.
 
-Levels L5 and L6 satisfy (a) and (b), but (c) and (d) are not satisfied. This is because the top and bottom outgoing operations of L4 have different disjunct successor sets this different ending junctions, and, respectively, the top and bottom incoming operations of L7 have disjunct predecessor sets and thus different 
-
- we can see that L5 is a\ required level, but it is not border level. This is because the top junction at L5 does not have an operation to the junction at L3, which is consistent with condition (f).
-
-
+Levels L5 and L6 satisfy (a) and (b), but (c) and (d) are not satisfied. This is because the top and bottom outgoing operations of L4 have different disjunct successor sets thus different ending junctions, and, respectively, the top and bottom incoming operations of L7 have disjunct predecessor sets and thus different junctions as well.
 
 \subsection{Resource chunks}
-So far we have only done aggregation based on
+So far we have only done aggregation based on the operations and their successors. Now we do aggregation based on the resources. While this is inspired by \cite{Dubach2025handling}, the implementation may differ as the authors did not provide us with sufficient details, only the conditions that are used to create the chunks.
+
+The goal is to merge the resource uses of the same resource for directly connected operations (by predecessor and successor sets) as well as merge parallel uses of the resource. What we do not want to group is reentries of resource, where on train acquires a resource, then releases it, and then acquires it again. Figure \ref{fig:chunks} shows an example of how operations using the same resource are merged.
+
+\begin{figure}[htbp!]
+\caption{Resource chunks}
+\label{fig:chunks}
+\begin{center}
+\includegraphics[width=.8\textwidth]{img/chunks.pdf}
+\end{center}
+\footnotesize \textit{Note:} Operations using the selected resource are red. (A) are chunks after directed merges, (B) is invalid chunk with reentry, (C) and (D) are valid chunks after parallel merges.
+\end{figure}
+
+The (B) case in figure \ref{fig:chunks} shows an invalid chunk, where the operations on the top have a reentry of the same resource, thus they cannot be in the same chunk.
+
+While direct merges might feel sufficient, in the following section \ref{sec:link_graph}, we will be creating a data structure that grows with the amount of chunks, so reducing the number of possible chunks will be helpful to reduce the requirements of said structure.
+
+Each chunk $c = (r_c,\ O_c)$ is defined by the source $r_c$ and its set of operations $O_c$. We say that the chunk is active if any of the operations $o \in O_c$ are active. Each operation $o$ also has its set of chunk $C_o$, one chunk for each resource it requires.
+
+\subsubsection{Procedure}
+We apply the following procedure for each train separately and for each resource that is used by the train:
+\begin{enumerate}
+  \item Get a set of all operation for a train that are using the selected resource $r$.
+  \item Create a \emph{disjoint set} data structure like in section \ref{sec:junct} for each operation using resource $r$.
+  \item For each operation union the sets of each predecessor and each successor with the operation of they share the same resource. These are the direct merges.
+  \item Iterate over the pairs of disjunct sets $\{O_{a},\ O_{b}\}$ and check if any of the operations $y \in O_{b}$ are reachable from any operation in $x \in O_{a}$, and vice versa check if any of the operations $x \in O_{a}$ are reachable from any operation $y \in O_{b}$. If they are not reachable, union $O_{a}$ and $O_{b}$. These are the parallel merges. Note: This is an iterative procedure, the following checks to other chunks are done for the whole merged set of operations, $O_c = O_{a} \cup O_{b}$.
+  \item Assign each chunk $c = (r, O_c)$ its set of operations $O_c$ and add $c$ to the set of chunks $C_o$ for each operation $o \in C_o$.
+\end{enumerate}
+
+\begin{remark}
+To check the reachability we use a simple breath first search \cite{moore1959shortest} from the starting set of operations that has a cutoff based on the maximum level of the target operations to reduce the search space.
+\end{remark}
+
+
+\section{Link graph}
+\label{sec:link_graph}
+This section describes a data structure that is used to generate implication rules for resource precedence of chunks. This will be useful to reduce the number of required variables and constrains in the following model for conflict resolution. We will also use it to explore how routing decision change the implication rules and how these decision may cause unwanted effects for scheduling.
+
+While the implication rules for resource precedence are discussed in \cite{MASCIS2002498}, and \cite{dariano2008improving} shows the structural implication rules for train scheduling, the only relation to routing is in \cite{Dubach2025handling} where they only use a specific set of conditions.
+
+We will try to broaden the set of conditions that can be used to generate the structural implication by searching pairs of matching pairs of chunk conflicts using this data structure. Because we will be maintaining a set of links between chunks, we are calling it \emph{link graph}. 
+
+\subsection{Resource chunk links}
+Because of the blocking nature of resource use, where we need to acquire all the resources $r_{b},\ b \in C_{y} $ for the chunks $C_{y}$ of operation $y$ to transition from operation $x$ to $y$, and only then can we release the resources $r_{a},\ a \in C_{x}$, we say that the chunks $C_{x}$ are \emph{linked} to chunks $C_{y}$, so each chunk $a \in C_{x}$ has a forward link $f = (a,\ b)$ to each chunk $b \in C_{y}$, and each chunk $b \in C_{y}$ has a backward link $g = (b,\ a)$ to each chunk $a \in C_{x}$.
+
+Because each operation $o$ can have multiple chunks, we create both forward $f = (a, b)$ and backward $g = (b, a)$ for each pair of chunks $(a, b),\ \forall a,\ b \in C_o,\ a \neq b$, creating what we call a direct link as opposed to the aforementioned transition link.
+
+\begin{remark}
+We keep track of forward links $F_c$ and backward links $G_c$ for each chunk $c$ separately, so we can have $(c, a) \in F_c$ and also $(c, a) \in G_c$ at the same time, which is the case for direct links on chunks on the same operation $o$, where $c, a \in C_o$. 
+\end{remark}
+
+It is important to note that the link is active if any of the transitions $(x, y)$ that create are active (both $x$ and $y$ are active), or it is direct link via the operation $o$ that is active. Figure \ref{fig:chunk_link} shows both a transition and a direct link example.
+
+\begin{figure}[htbp!]
+\caption{Resource chunk link}
+\label{fig:chunk_link}
+\begin{center}
+\includegraphics[width=.4\textwidth]{img/chunk_link.pdf}
+\end{center}
+\footnotesize \textit{Note:} Operations have their chunk sets. Chunks $a$ is blue, chunk $b$ is red. Transition link is at the top, direct link is at the bottom.
+\end{figure}
 
