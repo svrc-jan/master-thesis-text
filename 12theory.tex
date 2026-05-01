@@ -40,7 +40,7 @@ As you can see in figure \ref{fig:graph_example}, digraph allows for parallel ed
 \footnotesize \textit{Note:} (A) is graph, (B) is directed graph, (C) is multigraph, and (D) is directed multigraph.
 \end{figure}
 
-Since we will mostly be working with directed graph, to following definitions are tailored for directed graphs. The following definitions of operators also abuse the notation by omitting the specification of graph $G$, which will be included in the context of multiple graphs if necessary.
+Since we will mostly be working with directed graph, the following definitions are tailored for directed graphs. The following definitions of operators also abuse the notation by omitting the specification of graph $G$, which will be included in the context of multiple graphs if necessary.
 
 \begin{definition}
 Source (start) $\src(e) = u,\ e = (u,\ v)$ is the starting vertex of edge $e$.
@@ -71,11 +71,11 @@ In-degree $\indeg(v) = |\inedges(v)|$ is the number of incoming edges of $v$.
 \end{definition}
 
 \begin{definition}
-Out-degree $\outdeg(v) = |\outedges(v)|$ is the number of incoming edges of $v$.
+Out-degree $\outdeg(v) = |\outedges(v)|$ is the number of outgoing edges of $v$.
 \end{definition}
 
 \begin{definition}
-Path is $P = \mathrm{P}(u,\ v)$ from $u$ to $v$ is a sequence of edges $P = (e_1,\ \dots,\ e_{|P|})$, such that $\tar(e_{i-1}) = \src(e_i),\ 2 \leq i \leq |P|$, $u = \src(e_1)$ and $v = \tar(e_n)$.
+Path is $P = \mathrm{P}(u,\ v)$ from $u$ to $v$ is a sequence of edges $P = (e_1,\ \dots,\ e_{|P|})$, such that $\tar(e_{i-1}) = \src(e_i),\ 2 \leq i \leq |P|$, $u = \src(e_1)$ and $v = \tar(e_{|P|})$.
 \end{definition}
 
 \begin{definition}
@@ -98,7 +98,7 @@ Topological order can only be created for directed acyclic graphs.
 \end{theorem}
 
 \begin{proof}
-By contradiction, for path starting at $u$ and ending at $v$, $u \prec v$ in the topological order, because for each $e = (x, y)$ in path, $x \prec y$ and ordering $\prec$ is transitive. For cycle $u$ and $v$ are in the same spot in the order, this is a contradiction.
+By contradiction, for path starting at $u$ and ending at $v$, $u \prec v$ in the topological order, because for each $e = (x, y)$ in path, $x \prec y$ and ordering $\prec$ is transitive. For a cycle, $u$ and $v$ are in the same spot in the order, this is a contradiction.
 \end{proof}
 
 To detect a cycle and get a topological sort we use algorithm \ref{alg:toposort}, it is a combination of depth first search (DFS) for cycle detection and DFS for topological sorting \cite{CLRS2022}. It runs in $\mathrm{O}(|V| + |E|)$ time complexity with $\mathrm{O}(|V|)$ required space. It allows us to do both cycle detection and topological sort in one pass of DFS.
@@ -109,7 +109,7 @@ Algorithm \ref{alg:toposort} uses binary operator $+$ for concatenation of seque
 
 \begin{algorithm}[float, caption={Topological sort with cycle detection}, label={alg:toposort}]
 input: directed graph $G(V,\ E)$
-output: () if G contains cycle else topological order $O$
+output: () if G contains a cycle else topological order $O$
 
 function DFS($v$, $S$)
   if $\mathrm{label}(v) =$ InRecursion
@@ -158,7 +158,7 @@ end
 Alternative graphs were introduced in \cite{MASCIS2002498}. They provide a very useful framework for modeling resource allocation problems with blocking. They are a generalization of disjunctive graphs \cite{roy1964problemes}.
 
 \begin{definition}
-Alternative graph is an ordered tuple $G = (V,\ E,\ A)$, where $V = \{v_1,\ \dots,\ v_{|V|}\}$ is a set of vertices, $E = \{e_1,\ \dots,\ e_{|E|}\}$ is a set of edge $e = (u,\ v),\ u,\ v \in V$, and $A = \{a_1,\ \dots,\ a_{|A|}\}$ is a set of disjunctive (alternative) edge pairs $a = ((u,\ v),\ (x,\ y)),\ u,\ v,\ x,\ y \in V$.
+Alternative graph is an ordered tuple $G = (V,\ E,\ A)$, where $V$ are vertices and $E$ are edges, same as for directed graph, and $A = \{a_1,\ \dots,\ a_{|A|}\}$ is a set of disjunctive (alternative) edge pairs $a = ((u,\ v),\ (x,\ y)),\ u,\ v,\ x,\ y \in V$.
 \end{definition}
 
 \begin{remark}
@@ -177,11 +177,11 @@ To illustrate the concept of alternative graphs, figure \ref{fig:alt_graph_examp
 \end{figure}
 
 \begin{definition}
-A selection $S$ is a set of edges obtained by from $A$ by choosing at most one edge from each pair. The edges in this selection are selected, their alternatives (the other edge from the pair) is forbidden. 
+A selection $S$ is a set of edges obtained from $A$ by choosing at most one edge from each pair. The edges in this selection are selected, their alternatives (the other edge from the pair) is forbidden. 
 \end{definition}
 
 \begin{definition}
-Selection $S$ is complete if exactly one edges is chosen from each pair, otherwise it is a partial selection. 
+Selection $S$ is complete if exactly one edge is chosen from each pair, otherwise it is a partial selection. 
 \end{definition}
 
 \begin{definition}
@@ -204,10 +204,10 @@ Alternative edge $e$ is inferred from selection $S$, $S \vdash e$ if $S \cup \{\
 \end{definition}
 
 
-An example from on graphs in figure \ref{fig:alt_graph_example}, we can see that $(b,\ u) \implies (c,\ v)$ and $(v,\ a) \implies (w,\ b)$ etc.
+An example from the graph in figure \ref{fig:alt_graph_example}, we can see that $(b,\ u) \implies (c,\ v)$ and $(v,\ a) \implies (w,\ b)$ etc.
 
 \begin{remark}
-It is possible to have a partial consistent selection $P$ for which there exist no complete consistent complete selection $C$, $P \subset C$. One such case is in figure \ref{fig:alt_graph_infeasible}, where $(b,\ u) \implies (c,\ v)$ and $(x,\ c) \implies (w,\ b)$. Because $(c,\ v)$ and $(w,\ b)$ are in the same disjunctive pair, we cannot make a consistent selection for this pair.
+It is possible to have a partial consistent selection $P$ for which there exist no complete consistent selection $C$, $P \subset C$. One such case is in figure \ref{fig:alt_graph_infeasible}, where $(b,\ u) \implies (c,\ v)$ and $(y,\ c) \implies (w,\ b)$. Because $(c,\ v)$ and $(w,\ b)$ are in the same disjunctive pair, we cannot make a consistent selection for this pair.
 \end{remark}
 
 
@@ -254,9 +254,9 @@ The length of the longest path can only be calculated for a graph without any po
 \subsubsection{Event graphs}
 \label{sec:event_graphs}
 
-In our model, we will use weighted DAG we call an \emph{event graph}, where each vertex corresponds to an event, edge direction assigns precedence of events and the weight of an edge will be corresponding to a minimal duration between events. All events share the origin $o$ which determines the start of the timeline, and it is used to calculate the time of each following event.
+In our model, we will use a weighted DAG that we call an \emph{event graph}, where each vertex corresponds to an event, edge direction assigns precedence of events and the weight of an edge will be corresponding to a minimal duration between events. All events share the origin $o$ which determines the start of the timeline, and it is used to calculate the time of each following event.
 
-\paragraph{Example} Figure \ref{fig:event_graph} shows an event graph for 3 trains sharing resources. Edges $(o,\ a)$, $(o,\ g)$, and $(o,\ u)$ set the earliest start of the train, horizontal edges define the fastest passing of the section and diagonal edges ensure precedence for resources e.g. edge $(b,\ g)$ ensures that $g$ starts after $b$, since section $(a,\ b)$ required the same resource as $(g,\ h)$.
+\paragraph{Example} Figure \ref{fig:event_graph} shows an event graph for 3 trains sharing resources. Edges $(o,\ a)$, $(o,\ g)$, and $(o,\ u)$ set the earliest start of the train, horizontal edges define the fastest passing of a section and diagonal edges ensure precedence for resources e.g. edge $(b,\ g)$ ensures that $g$ starts after $b$, since section $(a,\ b)$ required the same resource as $(g,\ h)$.
 
 
 \begin{figure}[htbp!]
@@ -270,7 +270,7 @@ In our model, we will use weighted DAG we call an \emph{event graph}, where each
 The time of the event $x$ in the event graph can be calculated as the longest path from the origin $o$ to $x$, $\mathrm{T}(x) = \mathrm{L_{max}}(o,\ x)$.
 
 
-Finding all the paths from $o$ to each $x \in V$ would be very expensive, by DFS the complexity is exponential \cite{homer2011computability}.
+Finding all the paths from $o$ to each $x \in V$ would be very expensive. Using DFS the complexity is exponential \cite{homer2011computability}.
 
 First optimization is the use of Bellman principle \cite{light2024principle}\cite{bellman1952dynamic},
 
