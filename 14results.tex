@@ -1,17 +1,40 @@
 \chapter{Results}
 
+\subsubsection{Software and hardware}
+The implementation was done in \emph{C++} language \cite{cpp23}, using \emph{Gurobi} \cite{gurobi} as the MILP solver for both routing and conflict resolution. The source code is available from \url{https://github.com/svrc-jan/train-opt}. All computations were done on a computer with 
+i7-9700F CPU and 16 GB of RAM. 
+
 \subsubsection{Instance grouping}
 Because the DISPLIB has 112 instances, we split them into 10 groups with approximately the same size (9 to 16 instance per group) based in their initial source (encoded in the name), which also corresponds to the structure of the problem. Unless specified otherwise, the presented results will be the median across the instances inside the group, we feel that this number should be a good representation of the results as it will not be skewed by a single instance within the group and thus provide us with a valid overview that can still be distinguished between the groups.	
 
-\section{Preprocessing}
-To gauge how well did the aggregation of the instance 
-
+\section{Aggregation}
+To gauge how well did the aggregation of the instance data work, table \ref{tab:instance} presents the initial instance data counts. We can see that the instance vary in size, with respect to number of trains, operations, resources, etc. The most significant is the difference between the number of operations compared to number of operation to resource relations (ORR, sum of the number of required resources for each operation). While the \emph{nor} instances assign at most one resources to operation, the other instances allow multiple resources per operation.
 
 \begin{table}[htbp!]
 \begin{center}
 \caption{Initial instance data}
-\input{tables/instance_data.tex}
-\label{tab:instance_data}
+\label{tab:instance}
+\input{tables/instance_tab.tex}
 \end{center}
-\footnotesize $^\mathrm{a}$Operation to resource relations, will be compared to resource chunks.
 \end{table}
+
+Table \ref{tab:preprocess} shows the aggregation counts, and the relative reductions compared to the initial data. We provide the relative improvements to see well did the aggregation procedure reduce the count required objects. For example, the operation per level ratio gives how fewer vertices we need in the event graph compared to using each operation as a vertex, i.e. how much we can parallelize the events. Similarly, the objective per route ratio gives how fewer routing decisions we need to make compared to naively having a decision (most likely a binary variable) for each operation. The most impactful is probably the ORR per chunk ratio, as grouping the related resource conflicts is going to have a direct impact on how many conflicts we need to resolve to get a conflict free solution.
+
+\begin{table}[htbp!]
+\begin{center}
+\caption{Aggregation counts and relative reductions}
+\label{tab:preprocess}
+\input{tables/preprocess_tab.tex}
+\end{center}
+\end{table}
+
+Table \ref{tab:preprocess_opt} show
+
+\begin{table}[htbp!]
+\begin{center}
+\caption{Aggregation - additional data}
+\label{tab:preprocess_opt}
+\input{tables/preprocess_opt_tab.tex}
+\end{center}
+\end{table}
+

@@ -39,10 +39,10 @@ While the format allows both coefficient and increment to be non-zero, in practi
 
 Data \ref{data:obj} shows an example of an objective component entry in the instance JSON.
 
-The total objective $J$ is defined as a\ sum of components for active operations only,
+The total objective delay $\Delta$ is defined as a\ sum of components for active operations only,
 
 \begin{equation}
-J = \sum_{o \in O_{a,J}} c_o \max\{0, t_o - \bar{t}_o\} + d_o H(t_o - \bar{t}_o),
+\Delta = \sum_{o \in O_{a,\Delta}} c_o \max\{0, t_o - \bar{t}_o\} + d_o H(t_o - \bar{t}_o),
 \end{equation}
 
 where $O_{a,J}$ is a\ set of active operations that have an objective component, $t_o$ is start of the operation, $\bar{t}_o$ is the threshold for the operation, $c_o$ is the linear objective coefficient, $d_o$ is the stepwise objective increment, and $H(\cdot)$ is Heaviside step function \cite{abramowitz1972handbook}.
@@ -159,9 +159,9 @@ Consider the situation as in figure \ref{fig:swap_railway}, where two trains a\ 
 \end{center}
 \end{figure}
 
-In this situation, resource Y is being acquired by A while holding X and X is being required by B while holding Y.
-
-We can detect the resource swaps using an event graph by cycle detection, like in figure \ref{fig:swap_event} where A2 and B2 form a\ cycle.
+\begin{minipage}{\textwidth}
+In this situation, resource Y is being acquired by A while holding X and X is being required by B while holding Y. We can detect the resource swaps using an event graph by cycle detection, like in figure \ref{fig:swap_event} where A2 and B2 form a\ cycle.
+\end{minipage}
 
 \begin{figure}[htbp!]
 \caption{Resource swap event graph}
@@ -477,7 +477,7 @@ We can also see that L3 satisfies conditions (a), (c), and (d), but again, its j
 Levels L5 and L6 satisfy (a) and (b), but (c) and (d) are not satisfied. This is because the top and bottom outgoing operations of L4 have different disjunct successor sets thus different ending junctions, and, respectively, the top and bottom incoming operations of L7 have disjunct predecessor sets and thus different junctions as well.
 
 \subsection{Resource chunks}
-So far we have only done aggregation based on the operations and their successors. Now we do aggregation based on the resources. While this is inspired by \cite{Dubach2025handling}, the implementation may differ as the authors did not provide us with sufficient details, only the conditions that are used to create the chunks.
+So far we have only done aggregation based on the operations and their successors. Now we do aggregation based on the resources. While this is inspired by \textcite{Dubach2025handling}, the implementation may differ as the authors did not provide us with sufficient details, only the conditions that are used to create the chunks.
 
 The goal is to merge the resource uses of the same resource for directly connected operations (by predecessor and successor sets) as well as merge parallel uses of the resource. What we do not want to group is reentries of resource, where on train acquires a resource, then releases it, and then acquires it again. Figure \ref{fig:chunks} shows an example of how operations using the same resource are merged.
 
@@ -525,7 +525,7 @@ This section describes a data structure that is used to generate implication rul
 
 While the implication rules for resource precedence are discussed in \cite{MASCIS2002498}, and \cite{dariano2008improving} shows the structural implication rules for train scheduling, the only relation to routing is in \cite{Dubach2025handling} where they only use a specific set of conditions.
 
-We will try to broaden the set of conditions that can be used to generate the structural implication by searching matching pairs of chunk conflicts using this data structure. Because we will be maintaining a set of links between chunks, we are calling it \emph{link graph}. 
+We will try to broaden the set of conditions that can be used to generate the structural implication rules by searching matching pairs of chunk conflicts using this data structure. Because we will be maintaining a set of links between chunks, we are calling it \emph{link graph}. 
 
 \subsection{Resource chunk links}
 Resource acquisition is done in a blocking manner. This means, that to transition from operation $x$ to $y$, we need to acquire all the resources $r_{b},\ b \in C_{y} $ for the chunks $C_{y}$ of operation $y$ before we can release the resources $r_{a},\ a \in C_{x}$ for the chunks $C_x$ of operation $x$. Because of this relationship, we say that the chunks $C_{x}$ are \emph{linked} to chunks $C_{y}$, so each chunk $a \in C_{x}$ has a forward link $f = (a,\ b)$ to each chunk $b \in C_{y}$, and each chunk $b \in C_{y}$ has a backward link $g = (b,\ a)$ to each chunk $a \in C_{x}$.
@@ -582,7 +582,7 @@ There are two basic cases, trains going in the same (parallel) direction and tra
 
 As we can see, the precedence $p_a \implies p_b$,\footnote{There is a slight abuse of notation where we use $p_{k_a} = p_a$.} because $(i_m, h_n) \implies (j_m,\ i_n)$ in the alternative graph. Similarly, $p_b \implies p_a$ for  $(j_m, i_n) \implies (i_m,\ h_n)$, so $(p_a \iff p_b) \equiv (p_a = p_b)$. Because the precedence decisions $p_a$ and $p_b$ imply each other, we say that conflicts $k_a$ and $k_b$ are linked.
 
-Similarly, we can also see from figure \ref{fig:conf_par} that $p_b = p_c$, so $k_b$ is linked to $k_c$. Because $k_a$ and $k_b$ are linked, and $k_b$ and $k_c$ are linked, we say that conflicts $k_a$, $k_b$ and $k_c$ form a conflict chain $\{k_a,\ k_b,\ k_c\}$, whose precedence decision are equal, meaning that for all of these conflicts and their chunks, either train $m$ or $n$ is first, they cannot change their order.
+Similarly, we can also see from figure \ref{fig:conf_par} that $p_b = p_c$, so $k_b$ is linked to $k_c$. Because $k_a$ and $k_b$ are linked, and $k_b$ and $k_c$ are linked, we say that conflicts $k_a$, $k_b$ and $k_c$ form a conflict chain $\Gamma = \{k_a,\ k_b,\ k_c\}$, whose precedence decision are equal, meaning that for all of these conflicts and their chunks, either train $m$ or $n$ is first, they cannot change their order.
 
 The second case is the opposite direction case, where trains pass the resources in the opposite directions. This case is shown in figure \ref{fig:conf_opp}. Using the same logic as for the parallel case, we can see that $k_a$ and $k_b$ are linked, $p_a = p_b$, because $(i_m, j_n) \implies (j_m,\ i_n)$ and $(j_m,\ i_n) \implies (i_m, j_n)$. Again we can also see that $p_b = p_c$, so $k_a$, $k_b$, and $k_c$ form a chain for this case as well.
 
@@ -686,7 +686,6 @@ To use the link graph in practice we list all possible links activations (operat
 
 When we make a change to routes, thus changes to operations and transition, we only update the links affected by this change, as when making routing decisions we do them incrementally so only a small subset of possible operations and transitions is affected. This allows us to maintain the link graph continuously, without the overhead of recomputing it entirely for every change.
 
-\newpage
 
 \section{Route planning}
 To choose which routes will be selected, we implement a routing procedure that gradually selects routes that break the opposite conflict chains for conflicts that have overlapping chunk time intervals, or are close to each other. This routing selection is motivated by the finding in the last section, we for each opposite conflict chain, the second train can only enter the chunks in the chain only after the first train has passed them already, causing a significant delay.
@@ -731,8 +730,8 @@ The optimization of each section is done in the following steps:
 The ILP model for optimizing a section $S$ has the variables $z_R$ for each route $R$ and the flow constraints in equation \ref{eq:flow}, it can be written as
 
 \begin{align}
-  \min_{z_R} \sum_{R \in S} \lambda_R\ z_R & \\
-  \sum_{R \in \rho_{\mathrm{in}}(j)} z_R - \sum_{R \in \rho_{\mathrm{out}}(j)} z_R &= \begin{cases}
+  \min_{z_R} \sum_{R \in S} \lambda_R\ z_R,\\
+  \text{s.t.: }\sum_{R \in \rho_{\mathrm{in}}(j)} z_R - \sum_{R \in \rho_{\mathrm{out}}(j)} z_R &= \begin{cases}
     1 & \text{if $j$ is a\ start (source) junction} \\
     -1 & \text{if $j$ is an end (sink) junction} \\
     0 & \text{otherwise}
@@ -741,10 +740,114 @@ The ILP model for optimizing a section $S$ has the variables $z_R$ for each rout
 \end{align}
 where  $J_S$ is the set of routing junctions in the section $S$, $\rho_{\mathrm{in}}(j)$ is a\ set of incoming routes and $\rho_{\mathrm{in}}(j)$ is a\ set of outgoing routes for junction $j$.
 
-We iterate over sections because they are the smallest possible blocks of dependent routes and the routing decision as each section will affect the pricing of the following section, and thus optimizing all sections would be problematic as their interconnected nature makes it computationally infeasible. While a better than random order of sections could be utilized, we have not come up with a solution that would improve the loss optimization, compared to random order.
+We iterate over sections because they are the smallest possible blocks of dependent routes and the routing decision as each section will affect the pricing of the following section, and thus optimizing all sections would be problematic as their interconnected nature makes it computationally infeasible. While a better than random order of sections could be utilized, we have not come up with a solution that would improve the loss optimization, compared to random order of sections.
 
 While we could repeat the optimization steps or restart entirely it and try for a better solution, in practice there are no significant improvements in doing so. This is because most of the instances have some symmetry in their routing options where we might swap operations between trains without impacting the lengths of the chains.
 
 
 \section{Conflict resolution}
+Because 2 of the 3 winning solution in DISPLIB have used a big-M formulation \cite{wolsey1998integer} for the constraints implied by the routing and precedence decisions, we have decided to try a different approach based on a \emph{path and cycle} formulation \cite{lamorgese2019noncompact}\cite{lamorgese2015optimal}, which is similar to the LBBD in \textcite{Dubach2025handling}.
+
+This approach does not use the big-M constraints that are often problematic \cite{pineda2019not}\cite{codato2006combinatorial}. Choosing the value of the M greatly influence the performance of the optimizer, values that are too small cutoff feasible solutions, leading to an incorrect model, and values that are too big weaken the LP relaxation, which then requires more nodes in the branch-and-bound search to arrive at an integer solution, and can even cause numerical instability.
+
+Instead, we use an event graph which includes the selected alterative edges from precedence decision, and we add feasibility cuts to prevent cycles and to enforce lower-bound on delays based the current precedence variables via the critical path. This eliminates the need for big-M constrains, as the highest coefficients are the lower-bounds for the delays. The main drawback for this approach is that we may need to add an exponentially growing number of cuts to remove the infeasible solutions. This is why we use the link graph to group these precedence decisions into chains to reduce the required number of variables and cycle cuts.
+
+\subsection{Event graph}
+To generate the times of each level, we employ an event graph, where each level corresponds to one vertex of the graph (plus the origin). We add one edge for each operation from its starting level to its ending level with the weight equal to the minimum duration of the operation. We also add one edge for each conflict based on the current value of the precedence variable from the end of the first chunk to the start of the second chunk with the weight equal to its release time. Figures \ref{fig:event_cycle} and \ref{fig:event_path} show such event graph with both operation and precedence edges.
+
+\subsection{Cycle cuts}
+The MILP problem can assign values of precedence variables in such way that the selection of alternative edges is inconsistent (there exists a cycle in the graph). This situation is shown in figure \ref{fig:event_cycle}, where alterative edges $(j,\ u)$, $(w,\ x)$ and $(y,\ i)$ are part of a cycle.
+
+\begin{figure}[htbp!]
+\caption{Event graph - cycle}
+\label{fig:event_cycle}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{img/event_cycle.pdf}
+\end{center}
+\footnotesize \textit{Note:} Selected alterative edges are red. Alternative edges have their corresponding precedence variable.
+\end{figure}
+
+Because we cannot remove the operation edges (we are working with fixed routes), we prevent the cycle by adding a no good cut on the precedence variables in the cycle $\Pi_C$,
+\begin{equation}
+\label{eq:cycle_cut}
+\sum_{p \in \Pi_C} p \leq |\Pi_C| - 1,
+\end{equation}
+forcing any of the variables to change their value, preventing the cycle from forming. For the example, $\Pi_C = \{p_1,\ p_2,\ \bar{p}_3\},\ \bar{p}_3=1-p_3$.
+
+\subsection{Path cuts}
+For each active operation with an objective $o \in O_{a,\Delta}$, we have delay variable $\Delta_o$. The MILP model is trying to minimize these, but the event graph sets the earliest $t_o$ based on its critical path. This creates a lower-bound for the $\Delta_o$ variable based on the current precedence values. Figure \ref{fig:event_path} show such critical path for $s$, generating time $\mathrm{T}(s)$.
+
+\begin{figure}[htbp!]
+\caption{Event graph - critical path}
+\label{fig:event_path}
+\begin{center}
+\includegraphics[width=0.6\textwidth]{img/event_path.pdf}
+\end{center}
+\footnotesize \textit{Note:} Critical path for $s$ is red. Alternative edges on the critical path have their corresponding precedence variable.
+\end{figure}
+
+We can enforce the conditional lower-bound of delay $\Delta_o$, if it is violated, by adding a critical path cut,
+\begin{equation}
+\label{eq:path_cut}
+  \Big(\sum_{p \in \Pi_{P}} p - |\Pi_P| + 1\Big)\Big(\mathrm{T}(s) - \bar{t}_o\Big) \leq \Delta_o,
+\end{equation}
+where $\Pi_P$ is the set of precedence variables on the critical path, $\mathrm{T}(s)$ is the time of the starting level for $o$ (in the current graph), and $\bar{t}_o$ is the objective threshold. This cut is active only when all the precedence variable $\Pi_{P}$ along it are the same. For the example in figure \ref{fig:event_path}, only $p_1$ and $p_2$ are in the set $\Pi_P = \{p_1,\ p_2\}$, the third precedence variable is not on the critical path.
+
+If the objective is binary, thus $\Delta_o$ is binary, indicating that $t_o > \bar{t}_o$, then we just add an implication cut,
+\begin{equation}
+\label{eq:impl_cut}
+  \sum_{p \in \Pi_{P}} p - |\Pi_P| + 1 \leq \Delta_o.
+\end{equation}
+
+\subsection{Conflict discovery}
+We iteratively discover the conflicts by finding the first overlapping pair of chunks on the same resources. We then use the link graph to find the entire chain $\Gamma$ and for the discovered conflict and use one binary precedence variable $p_\Gamma \in \{0,\ 1\}$ for all the conflicts in the chain, $p_\Gamma = p_k,\ \forall k \in \Gamma$.
+
+Using the chain reduces the number of necessary variables and cycle constrains, because for a chain of 2 conflicts $a$ and $b$, we would need 2 variables $p_a$ and $p_b$ and 2 cycle cuts $p_a - p_b \leq 0$ and $p_b - p_a \leq 0$. So for each connection in the chain, we reduce the number of necessary variables by one, and the number of necessary cycle constrains by two.
+
+An additional advantage is that using the chain prevents resource swaps, as only possible swap without overlapping chunk intervals has to be on the same opposite conflict chain.
+
+\subsection{MILP model}
+The complete MILP model that is solved in each step is the following:
+\begin{align}
+  \min_{\Delta_o,p_\Gamma} &\sum_{o \in O_{a,\Delta}} c_o\Delta_o, \\
+  \text{s.t.: } &\text{all cycle cuts }, \\
+  &\text{all path cuts},
+\end{align}
+
+where $c_o$ is the coefficient (if continuous) or increment (if binary) of the objective for the operation $o$, cycle cuts have the form of equation \ref{eq:cycle_cut}, path cuts have the form equations \ref{eq:path_cut} and \ref{eq:impl_cut}.
+
+\begin{minipage}{\textwidth}
+\subsection{Procedure}
+The conflict resolution procedure is done in the following steps:
+
+\begin{enumerate}
+  \item Optimize the current MILP model.
+  \item Update the graph with current precedence values.
+  \item If graph contains a cycle, add the cycle cut (eq. \ref{eq:cycle_cut}) for the smallest set $\Pi_C$. Go to step 1.
+  \item If any delays violate the conditional lower-bound, add a path cut (eq. \ref{eq:path_cut} or \ref{eq:impl_cut}) for the most violated delay. Go to step 1.
+  \item Check if there are any conflicts in the chunk intervals. If yes, add the whole chain for the earliest conflict. Go to step 1.
+  \item Stop, we have a conflict free selection of precedences.
+\end{enumerate}
+\end{minipage}
+
+To better illustrate how the procedure works, figure \ref{fig:solver_diagram} show a diagram of what each component of the conflict resolution procedure provides for the others.
+
+\begin{figure}[htbp!]
+\caption{Conflict resolution diagram}
+\label{fig:solver_diagram}
+\begin{center}
+\includegraphics[width=0.6\textwidth]{img/solver_diagram.pdf}
+\end{center}
+\end{figure}
+
+While we could add multiple conflicts and/or multiple cuts per iteration, we are trying to limit the number conflicts and cuts, so the MILP model does not get cluttered and thus slows down. This is why we only add one cut or conflict per iteration and utilize the previous solution as a warm start, speeding up the computation.
+
+
+\subsubsection{Tuning the MILP optimizer}
+As there is a significant amount of cuts, we use a lazy constraint principle, where during the branch-and-bound procedure, each cut is treated as lazy and only added to the simplex table if it is violated. This is because by selecting a value for the precedence variable effectively disables all the cuts where the precedence variable has the opposite value, and thus they do not need to be considered. This significantly reduces the computational demand of the model and allows us to optimize models with thousands of cuts.
+
+\begin{minipage}{\textwidth}
+We also increase the value of the mixed-integer programming gap \cite{gurobi}, to shorten the search to solutions that might not be optimal, but are good enough. If we have spare time, we decrease the gap after each run of the conflict resolution procedure in hopes of finding a better solution.
+\end{minipage}
+
 
