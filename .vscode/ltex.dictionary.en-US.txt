@@ -1,7 +1,5 @@
 DISPLIB
 MILP
 subgraphs
-potention
 Decentralised
 acyclicity
-resultion
