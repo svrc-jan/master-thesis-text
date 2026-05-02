@@ -1,10 +1,10 @@
 \chapter{Theoretical background}
 \label{chap:theor}
 
-This chapter will cover the~necessary theory used to formulate and solve our problem. The main focus will be on graph topology and alternative graphs and their relation to the~train dispatching problem. 
+This chapter covers the~necessary theory used to formulate and solve our problem. The main focus is on graph topology and alternative graphs and their relation to the~train dispatching problem. 
 
 \section{Basic definitions}
-While some of~these definitions may feel redundant, we will use them as an~opportunity to~establish the~notation. Most of~the definitions are paraphrased from \emph{Handbook of~Graph Theory} by \textcite{gross2013handbook} with notation adjusted to our needs.
+While some of~these definitions may feel redundant, we use them as an~opportunity to~establish the~notation. Most of~the definitions are paraphrased from \emph{Handbook of~Graph Theory} by \textcite{gross2013handbook} with notation adjusted to our needs.
 
 
 \begin{definition}
@@ -28,7 +28,7 @@ A directed multigraph is an~ordered tuple $G = (V,\ E,\ s,\ t)$, where $V = \{v_
 An example for each type of~graph is in figure \ref{fig:graph_example}.
 
 \begin{remark}
-As you can see in figure \ref{fig:graph_example}, the digraph definition allows for edges (2, 3) and (3, 2) using the same vertices, but going in the opposite direction. This will be a~useful property for the~alternative graph definition.
+For the~digraph in~figure \ref{fig:graph_example}, the definition allows for edges (2, 3) and (3, 2) to exists, using the same vertices, but going in the opposite direction. This is be a~useful property for the~alternative graph definition.
 \end{remark}
 
 \begin{figure}[htbp!]
@@ -40,7 +40,7 @@ As you can see in figure \ref{fig:graph_example}, the digraph definition allows 
 \footnotesize \textit{Note:} (A) is a graph, (B) is a directed graph, (C) is a multigraph, and (D) is a directed multigraph.
 \end{figure}
 
-Since we will mostly be working with directed graphs, the~following definitions are tailored for directed graphs. The following definitions of~operators also abuse the~notation by omitting the~specification of~graph $G$, which will be included in the~context of~multiple graphs if necessary.
+Since we are mostly working with directed graphs, the~following definitions are tailored for directed graphs. The following definitions of~operators also abuse the~notation by omitting the~specification of~graph $G$, which is included in the~context of~multiple graphs if necessary.
 
 \newpage
 
@@ -85,7 +85,7 @@ A cycle is a~path that starts and ends in the~same vertex.
 \end{definition}
 
 \section{Graph topology}
-Because event graphs described later in section \ref{sec:event_graphs} require certain properties or concepts such as acyclicity and topological ordering \cite{BangJensen2008}, we will define and explain them in this section.
+Because event graphs described later in section \ref{sec:event_graphs} require certain properties or concepts such as acyclicity and topological ordering \cite{BangJensen2008}, we define and explain them in this section.
 
 \begin{definition}
 A directed acyclic graph (DAG) is a directed graph that contains no cycles.
@@ -253,7 +253,7 @@ The length of~the longest path can only be calculated for a~graph without any po
 \subsubsection{Event graphs}
 \label{sec:event_graphs}
 
-In our model, we will use a~weighted DAG that we call an~\emph{event graph}, where each vertex corresponds to an~event, edge direction assigns precedence of~events and the~weight of~an~edge will be corresponding to a~minimal duration between events. All events share the~origin $o$ which determines the~start of~the timeline, and it is used to calculate the~time of~each following event.
+In our model, we use a~weighted DAG that we call an~\emph{event graph}, where each vertex corresponds to an~event, edge direction assigns precedence of~events and the~weight of~an~edge corresponds to~a~minimal duration between events. All events share the~origin $o$ which determines the~start of~the timeline, and it is used to calculate the~time of~each following event.
 
 \paragraph{Example} Figure \ref{fig:event_graph} shows an~event graph for 3 trains sharing resources. Edges $(o,\ a)$, $(o,\ g)$, and $(o,\ u)$ set the~earliest start of~the train, horizontal edges define the~fastest passing of~a~section and diagonal edges ensure precedence for resources e.g., edge $(b,\ g)$ ensures that $g$ starts after $b$, since section $(a,\ b)$ required the~same resource as $(g,\ h)$.
 
@@ -285,7 +285,7 @@ Since we already use algorithm \ref{alg:toposort} to detect a~cycle, we can just
 Critical path $\mathrm{CP}(\cdot)$ for vertex $v$ is the~longest path from origin $o$ to $v$.
 \end{definition}
 
-Critical path limits the~earliest start of~event $v$, delaying any event along this path will also delay the~event $v$,
+Critical path limits the~earliest start of~event $v$, delaying any event along this path also delays the~event $v$,
 
 \begin{equation}
 	\mathrm{L}(\mathrm{CP}(v)) = \mathrm{T}(v).
@@ -303,7 +303,7 @@ We can again use the~Bellman principle to reconstruct the~critical path,
 Algorithm \ref{alg:time} outputs the~time $\mathrm{T}(\cdot)$ and critical path edge $\mathrm{CPE}(\cdot)$ for each vertex in the~event graph. It runs in $\mathrm{O}(|V| + |E|)$ time complexity.
 
 \begin{remark}
-In our event graph, the~first vertex in the~topological order will always be the~origin $o$ as it is the~only vertex $v$ with $\indeg(v) = 0$.
+In our event graph, the~first vertex in the~topological order is always the~origin $o$ as it is the~only vertex $v$ with $\indeg(v) = 0$.
 \end{remark}
 
 \begin{algorithm}[float, caption={Time and critical path predecessor calculation}, label={alg:time}]

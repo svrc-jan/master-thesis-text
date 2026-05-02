@@ -3,16 +3,16 @@
 
 \section{Motivation}
 
-Railway transportation remains relevant even after its long history due to its efficiency, safety, and~sustainability. However, the~most limiting factor has always been the~use of~the~required infrastructure. As such, the~critical problem of~utilizing the~railway effectively has always been scheduling. The complexity of~this problem is continuously increasing with the~size and~intricacy of~the~railway system as well as the~demand to use it. 
+Railway transportation remains relevant even after its long history due to its efficiency, safety, and~sustainability. However, the~most limiting factor has always been the~use of~the~required infrastructure. As such, the~critical problem of~utilizing the~railway infrastructure effectively has always been scheduling. The complexity of~this problem is continuously increasing with the~size and~intricacy of~the~railway system as well as the~demand for its use. 
 
-Traditionally, scheduling was done manually by humans; only with the~advancements of~optimization algorithms and~computational power have humans been aided by computers. This still produces a static schedule that might be unusable if a disruption occurs. This is the~train dispatching problem, where the~decisions are made in~real-time, managing delays and~conflicts as they happen. Real-time dispatching is often still only done by humans and~provides a~challenge for~optimization algorithms as they need to find an acceptable solution in~a matter of~minutes or~even seconds.
+Traditionally, scheduling was done manually by humans; only with the~advancements of~optimization algorithms and~computational power have humans been aided by computers. This still produces a static schedule that might be unusable if a disruption occurs. This is the~train dispatching problem, where the~decisions are made in~real-time, managing delays and~conflicts as they happen. Real-time dispatching is often still only done by humans and~provides a~significant challenge for~optimization algorithms as they need to find an acceptable solution in~a matter of~minutes or~even seconds.
 
 \section{Goals}
 The main goal of~this thesis is to develop a heuristic that is capable of~train dispatching in~real-time with interpretable results; a human should be able to understand the~structure of~the~result to verify its validity.
 
-The heuristic will be evaluated on~the~\emph{DISPLIB}\@: Train dispatching benchmark library \cite{kloster2025displiblibrarytraindispatching} consisting of~train dispatching problem (TDP) instances from real-world data. This library of~instances was introduced for~an optimization competition.
+The heuristic is be evaluated on~the~\emph{DISPLIB}\@: Train dispatching benchmark library \cite{kloster2025displiblibrarytraindispatching} consisting of~train dispatching problem (TDP) instances from real-world data. This library of~instances was introduced for~an optimization competition.
 
-A significant part of~this thesis is focused on~the~aggregation and the~structural analysis of~the~TDP as presented in~\emph{DISPLIB}. This is the~main innovation which allows us to use a top-down approach, reducing the~problem to selecting the~routes top-down and~then scheduling it with a more concise model, as opposed to the~bottom-up approach, building up the~solutions by sequentially routing and~resolving conflicts, which is used by the~winning solutions in~the~\emph{DISPLIB} competition.
+A significant part of~this thesis is focused on~the~aggregation and the~structural analysis of~the~TDP as presented in~\emph{DISPLIB}. This is the~main innovation which allows us to use a top-down approach, reducing the~problem to selecting the~routes top-down and~then scheduling the~trains with a more concise model, as opposed to the~bottom-up approach, building up the~solutions by sequentially routing and~resolving conflicts, which is used by the~winning solutions in~the~\emph{DISPLIB} competition.
 
 \section{Thesis structure}
 \begin{minipage}{\textwidth}
@@ -21,7 +21,7 @@ This thesis is structured in~the~following chapters with their contents:
 \begin{enumerate}
 	\item \hyperref[chap:intro]{\emph{Introduction:}} Outlines the~motivation, goals, and~structure of~this thesis.
 	%\hyperref[chap:lit_rev]
-	\item \hyperref[chap:lit_rev]{\emph{Literature review:}} Review of~the~pertinent literature separated into three parts, literature connected to the~\emph{DISPLIB}, the~most relevant resources inspiring the~heuristic or~providing key theoretical ideas, and~an overview of~selected state-of-the-art in~scheduling optimization.
+	\item \hyperref[chap:lit_rev]{\emph{Literature review:}} Review of~the~pertinent literature separated into three parts, literature connected to~\emph{DISPLIB}, the~most relevant resources inspiring the~heuristic or~providing key theoretical ideas, and~an overview of~the~selected state-of-the-art in~scheduling optimization.
 	\item \hyperref[chap:theor]{\emph{Theoretical background:}} Basic theory necessary for~the~description of~the~problem. The~main focus is on~graph topology and~the~use of~alternative and~disjunctive graphs for~scheduling models.
 	\item \hyperref[chap:method]{\emph{Methodology:}} Detailed description of~the~problem, aggregation, routing and~conflict resolution.
 	\item \hyperref[chap:results]{\emph{Results:}} Presentation of~the~performance of~the~procedures described in~methodology on~the~\emph{DISPLIB} instances.

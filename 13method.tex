@@ -178,11 +178,11 @@ Using cycles in~event graph to~detect resource swaps only works if all resource 
 
 \section{Problem aggregation}
 
-To effectively model the~problem we will aggregate the~operations and~resources from the~initial problem into several interconnected structures.
+To effectively model the~problem we aggregate the~operations and~resources from the~initial problem into several interconnected structures.
 
 \subsection{Junctions}
 \label{sec:junct}
-The first aggregation is what we call junctions, corresponding to~a~single event of~one operation starting and~one ending (except for~starting and~ending operations). Because we always want each operation to~have a~single determined event for~start and~end, the~junction graph is a~directed multigraph, where each edge corresponds to~an~operation (as opposed to~an~operation graph where each operation was a~vertex). Figure \ref{fig:junction} shows an~example of~an operation graph with corresponding junction graph. We use the~name junctions as~conceptually, the~operations converge and~diverge in~these points as~do real tracks in~railway junctions.
+The first aggregation is what we call junctions, corresponding to~a~single event of~one operation starting and~one ending (except for~starting and~ending operations). Because we always want each operation to~have a~single determined event for~start and~end, the~junction graph is a~directed multigraph, where each edge corresponds to~an~operation (as opposed to~an~operation graph where each operation is a~vertex). Figure \ref{fig:junction} shows an~example of~an operation graph with corresponding junction graph. We use the~name junctions as~conceptually, the~operations converge and~diverge in~these points as~do real tracks in~railway junctions.
 
 \begin{figure}[htbp!]
 \caption{Operation graph and~junction graph}
@@ -433,7 +433,7 @@ Border level is a~level that meets the~following conditions:
   \item[(d)] For~each outgoing operation $o_{\mathrm{out}} \in \outedges(L)$ of~level $L$, the~predecessor set of~$o_{\mathrm{out}}$ is equal to~the~set of~incoming operations of~$L$, $\mathrm{pred}(o_{\mathrm{out}}) = \inedges(L)$.
 \end{itemize}
 
-Condition (a) ensures that each section starts and~ends at~a~required level. Condition (b) ensures that we do not split a~route by~the~border level. Conditions (c) and~(d) ensure that any route from the~level can be taken independently of~which route was taken to~the~level and, vice versa, any route to~the~level can be taken independently of~which route was taken from the~level.
+Condition (a) ensures that each section starts and~ends at~a~required level. Condition (b) ensures that we do not split a~route by~the~border level. Conditions (c) and~(d) ensure that any route from the~level can be taken independently of~which route is taken to~the~level and, vice versa, any route to~the~level can be taken independently of~which route is taken from the~level.
 
 \begin{remark}
 A sufficient set of~conditions to~replace conditions (c) and~(d) is:
@@ -497,7 +497,7 @@ The goal is to~merge the~resource uses of~the~same resource for~directly connect
 
 The (B) case in~figure \ref{fig:chunks} shows an~invalid chunk, where the~operations on~the~top have a~reentry of~the~same resource, thus they cannot be in~the~same chunk.
 
-While direct merges might feel sufficient, in~the~following section \ref{sec:link_graph}, we will be creating a~data structure that grows with the~amount of~chunks, so reducing the~number of~possible chunks will be helpful to~reduce the~requirements of~said structure.
+While direct merges might feel sufficient, in~the~following section \ref{sec:link_graph}, we are creating a~data structure that grows with the~amount of~chunks, so reducing the~number of~possible chunks is helpful to~reduce the~requirements of~said structure.
 
 Each chunk $c = (r_c,\ O_c)$ is defined by~the~source $r_c$ and~its set of~operations $O_c$. We say that the~chunk is active if any of~the~operations $o \in O_c$ are active. Each operation $o$ also has its set of~chunk $C_o$, one chunk for~each resource it requires.
 
@@ -526,16 +526,16 @@ To check the~reachability we use a~simple breath first search (BFS) \cite{moore1
 
 \section{Link graph}
 \label{sec:link_graph}
-This section describes a~data structure that is used to~generate implication rules for~resource precedence of~chunks. This will be useful to~reduce the~number of~required variables and~constraints in~the~following model for~conflict resolution. We will also use it to~explore how routing decisions change the~implication rules and~how these decision may cause unwanted effects for~scheduling.
+This section describes a~data structure that is used to~generate implication rules for~resource precedence of~chunks. This is useful to~reduce the~number of~required variables and~constraints in~the~following model for~conflict resolution. We also use it to~explore how routing decisions change the~implication rules and~how these decision may cause unwanted effects for~scheduling.
 
 While the~implication rules for~resource precedence are discussed in~\cite{MASCIS2002498}, and~\cite{dariano2008improving} shows the~structural implication rules for~train scheduling, the~only relation to~routing is in~\cite{Dubach2025handling} where they only use a~specific set of~conditions.
 
-We will try to~broaden the~set of~conditions that can be used to~generate the~structural implication rules by~searching matching pairs of~chunk conflicts using this data structure. Because we will be maintaining a~set of~links between chunks, we are calling it \emph{link graph}. 
+We try to~broaden the~set of~conditions that can be used to~generate the~structural implication rules by~searching matching pairs of~chunk conflicts using this data structure. Because we are maintaining a~set of~links between chunks, we are calling it \emph{link graph}. 
 
 \subsection{Resource chunk links}
 Resource acquisition is done in~a~blocking manner. This means, that to~transition from operation $x$ to~$y$, we need to~acquire all the~resources $r_{b},\ b \in C_{y} $ for~the~chunks $C_{y}$ of~operation $y$ before we can release the~resources $r_{a},\ a~\in C_{x}$ for~the~chunks $C_x$ of~operation $x$. Because of~this relationship, we say that the~chunks $C_{x}$ are \emph{linked} to~chunks $C_{y}$, so each chunk $a \in C_{x}$ has a~forward link $f = (a,\ b)$ to~each chunk $b \in C_{y}$, and~each chunk $b \in C_{y}$ has a~backward link $g = (b,\ a)$ to~each chunk $a \in C_{x}$.
 
-Each operation $o$ can have multiple chunks, so we create both forward $f = (a, b)$ and~backward $g = (b, a)$ for~each pair of~chunks $(a, b),\ \forall a,\ b \in C_o,\ a~\neq b$, creating what we call a~direct link as~opposed to~the~aforementioned transition link. The set of~all forward links will create what we call the~\emph{forward link graph} $\mathcal{F} = (C, F)$, the~set of~all backward links are what we call \emph{backward link graph} $\mathcal{G} = (C, G)$, where vertices are the~chunks and~edges are the~links.
+Each operation $o$ can have multiple chunks, so we create both forward $f = (a, b)$ and~backward $g = (b, a)$ for~each pair of~chunks $(a, b),\ \forall a,\ b \in C_o,\ a~\neq b$, creating what we call a~direct link as~opposed to~the~aforementioned transition link. The set of~all forward links are what we call the~\emph{forward link graph} $\mathcal{F} = (C, F)$, the~set of~all backward links are what we call \emph{backward link graph} $\mathcal{G} = (C, G)$, where vertices are the~chunks and~edges are the~links.
 
 \begin{remark}
 We keep track of~forward links $F_c$ and~backward links $G_c$ for~each chunk $c$ separately, so we can have $(c, a) \in F_c$ and~also $(c, a) \in G_c$ at~the~same time, which is the~case for~direct links on~chunks on~the~same operation $o$, where $c, a~\in C_o$. 
@@ -553,7 +553,7 @@ It is important to~note that the~link is active if any of~the~transitions $(x, y
 \end{figure}
 
 \subsection{Conflicts and~precedence}
-A conflict $k = \{c_m, c_n\}$ is a~pair of~chunks $c_n$ and~$c_m$ on~the~same resource $r = r_{c_m} = r_{c_n}$ and~for~different trains $m = \mathrm{train}(c_m) < \mathrm{train}(c_n) = n$.\footnote{We select $n < m$ to~clearly define which train is first based on~the~precedence.} We resolve each conflict by~assigning precedence $p_k = 1 - \bar{p}_{k}$, meaning that if $p_k = 1$, the~resource $r$ will be released by~$c_m$ before it is acquired by~$c_n$, if $\bar{p}_k = 1$, the~resource $r$ will be released by~$c_n$ before it is acquired by~$c_m$.
+A conflict $k = \{c_m, c_n\}$ is a~pair of~chunks $c_n$ and~$c_m$ on~the~same resource $r = r_{c_m} = r_{c_n}$ and~for~different trains $m = \mathrm{train}(c_m) < \mathrm{train}(c_n) = n$.\footnote{We select $n < m$ to~clearly define which train is first based on~the~precedence.} We resolve each conflict by~assigning precedence $p_k = 1 - \bar{p}_{k}$, meaning that if $p_k = 1$, the~resource $r$ is released by~$c_m$ before it is acquired by~$c_n$, if $\bar{p}_k = 1$, the~resource $r$ is released by~$c_n$ before it is acquired by~$c_m$.
 
 We can model this situation using alternative graph where each vertex is an~event (junction or level), each edge is an~operation and~the~alternative pair is the~precedence decision. Figure \ref{fig:conflict} shows the~alternative graph for~a~conflict. By assigning precedence $p_k = 1$, we select edge $(j_m,\ i_n)$ from the~alternative pair $((j_m,\ i_n),\ (j_n,\ i_m))$ and~vice versa.
 
@@ -572,9 +572,9 @@ Without the~information about the~resources before and~after the~conflict, we ca
 
 \subsection{Conflict links}
 \label{sec:conf_links}
-Because the~trains pass the~chunks continuously and~in a~blocking manner, there are structural implication rules for~precedence for~conflicts on~these neighboring chunks. This is discussed in~\cite{dariano2008improving}, and~we will paraphrase these rules here.
+Because the~trains pass the~chunks continuously and~in a~blocking manner, there are structural implication rules for~precedence for~conflicts on~these neighboring chunks. This is discussed in~\cite{dariano2008improving}, and~we paraphrase these rules here.
 
-There are two basic cases, trains going in~the~same (parallel) direction and~trains going in~the~opposite direction. The first case was already shown in~section \ref{sec:alt_graph}, but we will reiterate it here to~show how the~inferred selection in~alternative graphs relates to~the~chunk precedence. The parallel case is shown in~figure \ref{fig:conf_par}.
+There are two basic cases, trains going in~the~same (parallel) direction and~trains going in~the~opposite direction. The first case has already been shown in~section \ref{sec:alt_graph}, but we reiterate it here to~show how the~inferred selection in~alternative graphs relates to~the~chunk precedence. The parallel case is shown in~figure \ref{fig:conf_par}.
 
 
 \begin{figure}[htbp!]
@@ -606,7 +606,7 @@ The second case is the~opposite direction case, where trains pass the~resources 
 While the~shown cases are trivial, in~practice, we do know which direction the~trains are passing\footnote{Trains might also be parallel in~one section and~opposite in~another section of~the~track.}, so we need to~use the~forward and~backward link graphs $\mathcal{F}$ and~$\mathcal{G}$ to~figure out the~direction.
 
 \begin{remark}
-The main motivation for~the~link graph was that finding the~linked pairs of~conflicts exhaustively was computationally expensive, and~while the~inferred selection conditions in~the~literature are theoretically sufficient, they were impractical to~check for~problems of~the~size found in~the~DISPLIB.
+The main motivation for~the~link graph is that finding the~linked pairs of~conflicts exhaustively is computationally expensive, and~while the~inferred selection conditions in~the~literature are theoretically sufficient, they are impractical to~check for~problems of~the~size found in~the~DISPLIB.
 \end{remark}
 
 To find if there exists a~link between two conflicts $k_a = (a_m,\ a_n)$ and~$k_b = (b_m,\ b_n)$ we can check the~link graphs for~a~matching chunk links. So conflicts $k_a$ and~$k_b$ have a~parallel link if either of~the~following conditions hold:
@@ -628,7 +628,7 @@ Condition (1) and~(2), and~(3) and~(4), respectively, are symmetric. This is bec
 Using these conditions, we can use BFS or DFS to~find the~entire chain of~conflicts from a~specific conflict, either by~selecting a~subset of~condition for~a~specific direction (parallel or opposite), or any condition to~find linked precedence decisions.
 
 \subsection{Scheduling effects of~conflict chains}
-Because trains cannot change order within the~conflict chain, we can observe direct effects on~the~possible scheduling of~trains to~each resource. First we will cover the~parallel case. For~two trains that have a~parallel resource chain $\Gamma = \{k_a,\ k_b,\ k_c\}$ and~on~resources $a$, $b$, and~$c$, and~operations on~$a$ have a~minimal duration of~2 units, on~$b$ they have 1 unit and~on~$c$ they have 3 units, with the~earliest possible scheduling the~schedule diagram (similar to~Gantt diagram) is shown in~figure \ref{fig:par_schedule}.
+Because trains cannot change order within the~conflict chain, we can observe direct effects on~the~possible scheduling of~trains to~each resource. First we cover the~parallel case. For~two trains that have a~parallel resource chain $\Gamma = \{k_a,\ k_b,\ k_c\}$ and~on~resources $a$, $b$, and~$c$, and~operations on~$a$ have a~minimal duration of~2 units, on~$b$ they have 1 unit and~on~$c$ they have 3 units, with the~earliest possible scheduling the~schedule diagram (similar to~Gantt diagram) is shown in~figure \ref{fig:par_schedule}.
 
 
 \begin{figure}[htbp!]
@@ -673,7 +673,7 @@ Furthermore, when looking at~train routing from a~safety perspective, an~opposit
 Conflict chains only impact the~scheduling only if the~affected trains want to~pass it at~the~same time. If they pass the~chain at~different times then the~precedence decision becomes trivial.
 \end{remark}
 
-Due to~these reasons, we will attempt to~break up these opposite conflict chains as~much as~possible when making routing decisions. If we want to~allow the~swap of~priority on~resources $a$ and~$c$, we need to~break the~conflict chain by~rerouting either train to~not use its chunk for~resource $b$. By doing this we allow the~schedule shown in~figure $\ref{fig:schedule_swap}$ where the~priority is swapped. As you can see, the~delay of~the~second train is entirely removed.
+Due to~these reasons, we attempt to~break up these opposite conflict chains as~much as~possible when making routing decisions. If we want to~allow the~swap of~priority on~resources $a$ and~$c$, we need to~break the~conflict chain by~rerouting either train to~not use its chunk for~resource $b$. By doing this we allow the~schedule shown in~figure $\ref{fig:schedule_swap}$ where the~priority is swapped. As you can see, the~delay of~the~second train is entirely removed.
 
 \begin{figure}[htbp!]
 \caption{Schedule diagram - swapping}
@@ -685,7 +685,7 @@ Due to~these reasons, we will attempt to~break up these opposite conflict chains
 \end{figure}
 
 \begin{remark}
-While the~trains in~figure $\ref{fig:schedule_swap}$ have no overlapping intervals, we still need the~resource $d$. If both trains were scheduled to~$b$ then we would not have a~time collision, however they would still break the~no-swapping requirement.
+While the~trains in~figure $\ref{fig:schedule_swap}$ have no overlapping intervals, we still need the~resource $d$. If both trains are scheduled to~$b$ then we do not have a~time interval collision, however we still break the~no-swapping requirement.
 \end{remark}
 
 \subsubsection{Implementation details}
@@ -695,7 +695,7 @@ When we make changes to~routes, thus changes to~operations and~transition, we on
 
 
 \section{Route planning}
-To choose which routes will be selected, we implement a~routing procedure that gradually selects routes that break the~opposite conflict chains for~conflicts that have overlapping chunk time intervals, or are close to~each other. This routing selection is motivated by~the~finding in~the~last section. For~each opposite conflict chain, the~second train can only enter the~chunks in~the~chain only after the~first train has passed them already, causing a~significant delay.
+To choose which routes are selected, we implement a~routing procedure that gradually selects routes that break the~opposite conflict chains for~conflicts that have overlapping chunk time intervals, or are close to~each other. This routing selection is motivated by~the~finding in~the~last section. For~each opposite conflict chain, the~second train can only enter the~chunks in~the~chain only after the~first train has passed them already, causing a~significant delay.
 
 
 \subsection{Loss calculation}
@@ -722,7 +722,7 @@ The routing procedure is done in~following steps:
   \item Get the~average level time by~randomized routing. This means that for~each train we simulate passing the~operation graph by~selecting each successor at~random with equal probability. We can get the~level time by~the~earliest possible time for~the~operation by~applying constraints for~the~lower bound for~its start and~minimal duration from its predecessor.
   \item Get the~set of~close conflicts by~checking which chunks have overlapping intervals. This is done while all operations are activated. We also stretch the~interval on~both sides to~get conflicts that are not yet overlapping, but might be when the~scheduling shifts them. We assign these conflicts to~trains for~loss calculation.
   \item Initialize current routing selection at~random, similar to~step 1.
-  \item Freeze all current routing variables $z_R$ by~fixing their bounds. This will reduce the~ILP model size in~preprocessing of~the~ILP model as~the~fixed variables will be substituted.
+  \item Freeze all current routing variables $z_R$ by~fixing their bounds. This reduces the~ILP model size in~preprocessing of~the~ILP model as~the~fixed variables are substituted.
   \item Select all sections that have more than one route.
   \item Optimize the~selected sections in~random order.
 \end{enumerate}
@@ -750,7 +750,7 @@ The ILP model for~optimizing a~section $S$ has the~variables $z_R$ for~each rout
 \end{align}
 where  $J_S$ is the~set of~routing junctions in~the~section $S$, $\rho_{\mathrm{in}}(j)$ is a~set of~incoming routes and~$\rho_{\mathrm{in}}(j)$ is a~set of~outgoing routes for~junction $j$.
 
-We iterate over sections because they are the~smallest possible blocks of~dependent routes and~the~routing decision of~each section will affect the~pricing of~the~following section, and~thus optimizing all sections would be problematic as~their interconnected nature makes it computationally infeasible. While a~better than random order of~sections could be utilized, we have not come up with a~solution that would improve the~loss optimization, compared to~random order of~sections.
+We iterate over sections because they are the~smallest possible blocks of~dependent routes and~the~routing decision of~each section affects the~pricing of~the~following section, and~thus optimizing all sections would be problematic as~their interconnected nature makes it computationally infeasible. While a~better than random order of~sections could be utilized, we have not come up with a~solution that would improve the~loss optimization, compared to~random order of~sections.
 
 While we could repeat the~optimization steps or restart it entirely and~try for~a~better solution, in~practice there are no significant improvements in~doing so. This is because most of~the~instances have some symmetry in~their routing options where we might swap operations between trains without impacting the~lengths of~the~chains.
 
