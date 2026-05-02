@@ -1,34 +1,34 @@
 \chapter{Theoretical background}
+\label{chap:theor}
 
-This chapter will cover the necessary theory used to formulate and solve our problem. Main focus will be on graph topology and alternative graphs and their relation to the train dispatching problem. 
+This chapter will cover the~necessary theory used to formulate and solve our problem. The main focus will be on graph topology and alternative graphs and their relation to the~train dispatching problem. 
 
 \section{Basic definitions}
-While some of these definitions may feel redundant, we will use them as an opportunity to establish the notation. Most of the definitions are paraphrased from \emph{Handbook of Graph Theory} \cite{gross2013handbook} with notation adjusted to ours.
+While some of~these definitions may feel redundant, we will use them as an~opportunity to~establish the~notation. Most of~the definitions are paraphrased from \emph{Handbook of~Graph Theory} by \textcite{gross2013handbook} with notation adjusted to our needs.
 
 
 \begin{definition}
-Graph is an ordered pair $G = (V,\ E)$, where $V = \{v_1,\ \dots,\ v_{|V|}\}$ is a set of vertices\footnote{\label{note:nodes}Vertices are often called nodes.} and $E = \{e_1,\ \dots,\ e_{|E|}\}$ is a set of edges, where edge $e = \{u,\ v\},\ u,\ v \in V$ is an \emph{unordered} pair of vertices.
+A graph is an~ordered pair $G = (V,\ E)$, where $V = \{v_1,\ \dots,\ v_{|V|}\}$ is a~set of~vertices\footnote{\label{note:nodes}Vertices are often called nodes.} and $E = \{e_1,\ \dots,\ e_{|E|}\}$ is a~set of~edges, where edge $e = \{u,\ v\},\ u,\ v \in V$ is an~\emph{unordered} pair of~vertices.
 \end{definition}
 
 \begin{definition}
 \label{def:digraph}
-Directed graph (digraph) is an ordered pair $G = (V,\ E)$, where $V = \{v_1,\ \dots,\ v_{|V|}\}$ is a set of vertices and $E = \{e_1,\ \dots,\ e_{|E|}\}$ is a set of edges\footnote{\label{note:arcs}Commonly the edges in directed graphs are called arcs.}, where edge $e = (u,\ v),\ u,\ v \in V$ is an \emph{ordered} pair of vertices.
+A directed graph (digraph) is an~ordered pair $G = (V,\ E)$, where $V = \{v_1,\ \dots,\ v_{|V|}\}$ is a~set of~vertices and $E = \{e_1,\ \dots,\ e_{|E|}\}$ is a~set of~edges\footnote{\label{note:arcs}Commonly the~edges in directed graphs are called arcs.}, where edge $e = (u,\ v),\ u,\ v \in V$ is an~\emph{ordered} pair of~vertices.
 \end{definition}
 
 
 \begin{definition}
-Multigraph is an ordered tuple $G = (V,\ E,\ r)$, where $V = \{v_1,\ \dots,\ v_{|V|}\}$ is a set of vertices, $E = \{e_1,\ \dots,\ e_{|E|}\}$ is a set of edges and $r:\ E \rightarrow \{\{u,\ v\}\ |\ u,\ v \in V\}$ is a mapping from edges to \emph{unordered} pairs of endpoint vertices.
+A multigraph is an~ordered tuple $G = (V,\ E,\ r)$, where $V = \{v_1,\ \dots,\ v_{|V|}\}$ is a~set of~vertices, $E = \{e_1,\ \dots,\ e_{|E|}\}$ is a~set of~edges and $r:\ E \rightarrow \{\{u,\ v\}\ |\ u,\ v \in V\}$ is a~mapping from edges to \emph{unordered} pairs of~endpoint vertices.
 \end{definition}
 
 \begin{definition}
-Directed multigraph is an ordered tuple $G = (V,\ E,\ s,\ t)$, where $V = \{v_1,\ \dots,\ v_{|V|}\}$ is a set of vertices, $E = \{e_1,\ \dots,\ e_{|E|}\}$ is a set of edges and $s:\ E \rightarrow V$ is a source (start) mapping from edges to vertices and $t:\ E \rightarrow V$ is a target (end) mapping from edges to vertices.
+A directed multigraph is an~ordered tuple $G = (V,\ E,\ s,\ t)$, where $V = \{v_1,\ \dots,\ v_{|V|}\}$ is a~set of~vertices, $E = \{e_1,\ \dots,\ e_{|E|}\}$ is a~set of~edges and $s:\ E \rightarrow V$ is a~source (start) mapping from edges to vertices and $t:\ E \rightarrow V$ is a~target (end) mapping from edges to vertices.
 \end{definition}
 
-
-Example of each type of graph is in figure \ref{fig:graph_example}.
+An example for each type of~graph is in figure \ref{fig:graph_example}.
 
 \begin{remark}
-As you can see in figure \ref{fig:graph_example}, digraph allows for parallel edges (2, 3) and (3, 2). This will be a useful property for the alternative graph definition.
+As you can see in figure \ref{fig:graph_example}, digraph allows for parallel edges (2, 3) and (3, 2). This will be a~useful property for the~alternative graph definition.
 \end{remark}
 
 \begin{figure}[htbp!]
@@ -37,60 +37,60 @@ As you can see in figure \ref{fig:graph_example}, digraph allows for parallel ed
 \begin{center}
 \includegraphics[width=.6\textwidth]{img/graph_example.pdf}
 \end{center}
-\footnotesize \textit{Note:} (A) is graph, (B) is directed graph, (C) is multigraph, and (D) is directed multigraph.
+\footnotesize \textit{Note:} (A) is a graph, (B) is a directed graph, (C) is a multigraph, and (D) is a directed multigraph.
 \end{figure}
 
-Since we will mostly be working with directed graph, the following definitions are tailored for directed graphs. The following definitions of operators also abuse the notation by omitting the specification of graph $G$, which will be included in the context of multiple graphs if necessary.
+Since we will mostly be working with directed graphs, the~following definitions are tailored for directed graphs. The following definitions of~operators also abuse the~notation by omitting the~specification of~graph $G$, which will be included in the~context of~multiple graphs if necessary.
 
 \begin{definition}
-Source (start) $\src(e) = u,\ e = (u,\ v)$ is the starting vertex of edge $e$.
+The source (start) $\src(e) = u,\ e = (u,\ v)$ is the~starting vertex of~edge $e$.
 \end{definition}
 
 \begin{definition}
-Target (end) $\tar(e) = v,\ e = (u,\ v)$ is the ending vertex of edge $e$.
+The target (end) $\tar(e) = v,\ e = (u,\ v)$ is the~ending vertex of~edge $e$.
 \end{definition}
 
 \begin{definition}
-Incoming edges $\inedges(v) = \{e\ |\ t(e) = v,\ e \in E\}$ of vertex $v$ is a set of edges $e$ that end in $v$.
+The incoming edges $\inedges(v) = \{e\ |\ t(e) = v,\ e \in E\}$ of~vertex $v$ are a~set of~edges $e$ that end in $v$.
 \end{definition}
 
 \begin{definition}
-Outgoing edges $\outedges(v) = \{e\ |\ s(e) = v,\ e \in E\}$ of vertex $v$ is a set of edges $e$ that start in $v$.
+The outgoing edges $\outedges(v) = \{e\ |\ s(e) = v,\ e \in E\}$ of~vertex $v$ are a~set of~edges $e$ that start in $v$.
 \end{definition}
 
 \begin{definition}
-Predecessors (In-neighborhood) $\inver(v) = \{u\ |\ u = \src(e),\ e \in \inedges(v)\}$ of vertex $v$ is a set of vertices $u$ that are connected to $v$ via its incoming edges.
+The predecessors (In-neighborhood) $\inver(v) = \{u\ |\ u = \src(e),\ e \in \inedges(v)\}$ of~vertex $v$ are a~set of~vertices $u$ that are connected to $v$ via its incoming edges.
 \end{definition}
 
 \begin{definition}
-Successors (Out-neighborhood) $\outver(v) = \{w\ |\ w = \tar(e),\ e \in \outedges(v)\}$ of vertex $v$ is a set of vertices $w$ that are connected to $v$ via its outgoing edges.
+The successors (Out-neighborhood) $\outver(v) = \{w\ |\ w = \tar(e),\ e \in \outedges(v)\}$ of~vertex $v$ are a~set of~vertices $w$ that are connected to $v$ via its outgoing edges.
 \end{definition}
 
 \begin{definition}
-In-degree $\indeg(v) = |\inedges(v)|$ is the number of incoming edges of $v$.
+The in-degree $\indeg(v) = |\inedges(v)|$ is the~number of~incoming edges of~$v$.
 \end{definition}
 
 \begin{definition}
-Out-degree $\outdeg(v) = |\outedges(v)|$ is the number of outgoing edges of $v$.
+The out-degree $\outdeg(v) = |\outedges(v)|$ is the~number of~outgoing edges of~$v$.
 \end{definition}
 
 \begin{definition}
-Path is $P = \mathrm{P}(u,\ v)$ from $u$ to $v$ is a sequence of edges $P = (e_1,\ \dots,\ e_{|P|})$, such that $\tar(e_{i-1}) = \src(e_i),\ 2 \leq i \leq |P|$, $u = \src(e_1)$ and $v = \tar(e_{|P|})$.
+A path $P = \mathrm{P}(u,\ v)$ from $u$ to $v$ is a~sequence of~edges $P = (e_1,\ \dots,\ e_{|P|})$, such that $\tar(e_{i-1}) = \src(e_i),\ 2 \leq i \leq |P|$, $u = \src(e_1)$ and $v = \tar(e_{|P|})$.
 \end{definition}
 
 \begin{definition}
-Cycle is a path that starts and ends in the same vertex.
+A cycle is a~path that starts and ends in the~same vertex.
 \end{definition}
 
 \section{Graph topology}
 Because event graphs described later in section \ref{sec:event_graphs} require certain properties or concepts such as acyclicity and topological ordering \cite{BangJensen2008}, this section will define and explain them.
 
 \begin{definition}
-Directed acyclic graph (DAG) is directed graph that contains no cycles.
+A directed acyclic graph (DAG) is a directed graph that contains no cycles.
 \end{definition}
 
 \begin{definition}
-Topological order $O$ is a sequence of vertices in a directed graph $O = (v_1,\ \dots,\ v_{|V|})$ such that $e = (v_j,\ v_j) \implies v_i \prec v_j$ ($i < j$, $v_i$ appears before $v_j$ in the sequence).
+A topological order $O$ is a~sequence of~vertices in a~directed graph $O = (v_1,\ \dots,\ v_{|V|})$ such that $e = (v_i,\ v_j) \implies v_i \prec v_j$ ($i < j$, $v_i$ appears before $v_j$ in the~sequence).
 \end{definition}
 
 \begin{theorem}
@@ -98,13 +98,13 @@ Topological order can only be created for directed acyclic graphs.
 \end{theorem}
 
 \begin{proof}
-By contradiction, for path starting at $u$ and ending at $v$, $u \prec v$ in the topological order, because for each $e = (x, y)$ in path, $x \prec y$ and ordering $\prec$ is transitive. For a cycle, $u$ and $v$ are in the same spot in the order, this is a contradiction.
+By contradiction, for path starting at $u$ and ending at $v$, $u \prec v$ in the~topological order, because for each $e = (x, y)$ in path, $x \prec y$ and ordering $\prec$ is transitive. For a~cycle, $u$~and~$v$ are in the~same spot in the~order, this is a~contradiction.
 \end{proof}
 
-To detect a cycle and get a topological sort we use algorithm \ref{alg:toposort}, it is a combination of depth first search (DFS) for cycle detection and DFS for topological sorting \cite{CLRS2022}. It runs in $\mathrm{O}(|V| + |E|)$ time complexity with $\mathrm{O}(|V|)$ required space. It allows us to do both cycle detection and topological sort in one pass of DFS.
+To detect a~cycle and get a~topological sort we use algorithm \ref{alg:toposort}, it is a~combination of~depth first search (DFS) for cycle detection and DFS for topological sorting \cite{CLRS2022}. It runs in $\mathrm{O}(|V| + |E|)$ time complexity with $\mathrm{O}(|V|)$ required space. It allows us to do both cycle detection and topological sort in one pass of~DFS.
 
 \begin{remark}
-Algorithm \ref{alg:toposort} uses binary operator $+$ for concatenation of sequences, so for $S_1 = (a,\ b),\ S_2=(c,\ d),\ S_1 + S_2 = (a,\ b,\ c,\ d)$.
+Algorithm \ref{alg:toposort} uses binary operator $+$ for concatenation of~sequences, so for $S_1 = (a,\ b),\ S_2=(c,\ d),\ S_1 + S_2 = (a,\ b,\ c,\ d)$.
 \end{remark}
 
 \begin{algorithm}[float, caption={Topological sort with cycle detection}, label={alg:toposort}]
@@ -155,17 +155,17 @@ end
 \section{Alternative graphs}
 \label{sec:alt_graph}
 
-Alternative graphs were introduced in \cite{MASCIS2002498}. They provide a very useful framework for modeling resource allocation problems with blocking. They are a generalization of disjunctive graphs \cite{roy1964problemes}.
+Alternative graphs were introduced in \cite{MASCIS2002498}. They provide a~very useful framework for modeling resource allocation problems with blocking. They are a~generalization of~disjunctive graphs \cite{roy1964problemes}.
 
 \begin{definition}
-Alternative graph is an ordered tuple $G = (V,\ E,\ A)$, where $V$ are vertices and $E$ are edges, same as for directed graph, and $A = \{a_1,\ \dots,\ a_{|A|}\}$ is a set of disjunctive (alternative) edge pairs $a = ((u,\ v),\ (x,\ y)),\ u,\ v,\ x,\ y \in V$.
+An alternative graph is an~ordered tuple $G = (V,\ E,\ A)$, where $V$ are vertices and $E$ are edges, the~same as for directed graph (def. \ref{def:digraph}), and $A = \{a_1,\ \dots,\ a_{|A|}\}$ is a~set of~disjunctive (alternative) edge pairs $a = ((u,\ v),\ (x,\ y)),\ u,\ v,\ x,\ y \in V$.
 \end{definition}
 
 \begin{remark}
-We denote the alternative $\bar{e}$ to the edge $e$ from the disjunctive pair $a = (e,\ \bar{e})$.
+We denote the~alternative $\bar{e}$ to the~edge $e$ from the~disjunctive pair $a = (e,\ \bar{e})$.
 \end{remark}
 
-To illustrate the concept of alternative graphs, figure \ref{fig:alt_graph_example} shows an alterative graph with 3 disjunctive pairs.
+To illustrate the~concept of~alternative graphs, figure \ref{fig:alt_graph_example} shows an~alternative graph with 3 disjunctive pairs.
 
 \begin{figure}[htbp!]
 \caption{Alternative graph}
@@ -173,22 +173,22 @@ To illustrate the concept of alternative graphs, figure \ref{fig:alt_graph_examp
 \begin{center}
 \includegraphics[width=0.5\textwidth]{img/alt_graph_example.pdf}
 \end{center}
-\footnotesize \textit{Note:} Alternative edges are dotted, alternative pairs grouped by color.
+\footnotesize \textit{Note:} Alternative edges are dotted, alternative pairs are grouped by color.
 \end{figure}
 
 \begin{definition}
-A selection $S$ is a set of edges obtained from $A$ by choosing at most one edge from each pair. The edges in this selection are selected, their alternatives (the other edge from the pair) is forbidden. 
+A selection $S$ is a~set of~edges obtained from $A$ by choosing at most one edge from each pair. The edges in this selection are selected, their alternatives (the other edges from each pair) are forbidden. 
 \end{definition}
 
 \begin{definition}
-Selection $S$ is complete if exactly one edge is chosen from each pair, otherwise it is a partial selection. 
+A selection $S$ is complete if exactly one edge is chosen from each pair, otherwise it is a~partial selection. 
 \end{definition}
 
 \begin{definition}
-Selection $S$ is consistent if graph $(V,\, E \cup S)$ does not contain a cycle. If the graph does contain a cycle, the selection is inconsistent.
+A selection $S$ is consistent if the graph $(V,\, E \cup S)$ does not contain a~cycle. If the~graph does contain a~cycle, the~selection is inconsistent.
 \end{definition}
 
-To illustrate the selection terms, figure \ref{fig:alt_graph_selection} shows different types of selections from on alternative graph from figure \ref{fig:alt_graph_example}.
+To illustrate the~selection terms, figure \ref{fig:alt_graph_selection} shows different types of~selections on alternative graph from figure \ref{fig:alt_graph_example}.
 
 \begin{figure}[htbp!]
 \caption{Alternative graph with selections}
@@ -200,14 +200,14 @@ To illustrate the selection terms, figure \ref{fig:alt_graph_selection} shows di
 \end{figure}
 
 \begin{definition}
-Alternative edge $e$ is inferred from selection $S$, $S \vdash e$ if $S \cup \{\bar{e}\}$ is an inconsistent selection, meaning that the choice of $e$ from alternative pair $(e,\ \bar{e})$ can be inferred from $S$ because choosing $\bar{e}$ would be inconsistent. Similarly, we can say that one alternative edge $x$ implies another $y$, $x \implies y$ if $\{x\} \vdash y$.
+An alternative edge $e$ is inferred from selection $S$, $S \vdash e$ if $S \cup \{\bar{e}\}$ is an~inconsistent selection, meaning that the~choice of~$e$ from alternative pair $(e,\ \bar{e})$ can be inferred from $S$ because choosing $\bar{e}$ would be inconsistent. Similarly, we can say that one alternative edge $x$ implies another $y$, $x \implies y$ if $\{x\} \vdash y$.
 \end{definition}
 
 
-An example from the graph in figure \ref{fig:alt_graph_example}, we can see that $(b,\ u) \implies (c,\ v)$ and $(v,\ a) \implies (w,\ b)$ etc.
+An example from the~graph in figure \ref{fig:alt_graph_example}, we can see that $(b,\ u) \implies (c,\ v)$ and $(v,\ a) \implies (w,\ b)$ etc.
 
 \begin{remark}
-It is possible to have a partial consistent selection $P$ for which there exist no complete consistent selection $C$, $P \subset C$. One such case is in figure \ref{fig:alt_graph_infeasible}, where $(b,\ u) \implies (c,\ v)$ and $(y,\ c) \implies (w,\ b)$. Because $(c,\ v)$ and $(w,\ b)$ are in the same disjunctive pair, we cannot make a consistent selection for this pair.
+It is possible to have a~partial consistent selection $P$ for which there exists no complete consistent selection $C$, $P \subset C$. One such case is in figure \ref{fig:alt_graph_infeasible}, where $(b,\ u) \implies (c,\ v)$ and $(y,\ c) \implies (w,\ b)$. Because $(c,\ v)$ and $(w,\ b)$ are in the~same disjunctive pair, we cannot make a~consistent selection for this pair.
 \end{remark}
 
 
@@ -224,15 +224,15 @@ It is possible to have a partial consistent selection $P$ for which there exist 
 
 \subsection{Weighted graphs}
 
-To extend the descriptive ability of graphs to model problems we assign properties to vertices or edges. One of the most common ones is to add weights to edges.
+To extend the~descriptive ability of~graphs to model problems, we assign properties to vertices or edges. One of~the most common ones is to add weights to edges.
 
 \begin{definition}
-Weighted directed graph is an ordered tuple $G = (V,\ E,\ w)$, where $V$ and $E$ are same as in digraph definition \ref{def:digraph}, and $w: E \rightarrow \mathbb{R}$ is an edge weight mapping.
+A weighted directed graph is an~ordered tuple $G = (V,\ E,\ w)$, where $V$ and $E$ are the~same as in digraph (def. \ref{def:digraph}), and $w: E \rightarrow \mathbb{R}$ is an~edge weight mapping.
 \end{definition}
 
 
 \begin{definition}
-Length $\mathrm{L}(\cdot)$ of path $P$ is the sum of the weights of each edge,
+The length $\mathrm{L}(\cdot)$ of~path $P$ is the~sum of~the weights of~each edge,
 \begin{equation}
 \mathrm{L}(P) = \sum_{e \in P} w_e
 \end{equation}
@@ -240,23 +240,23 @@ Length $\mathrm{L}(\cdot)$ of path $P$ is the sum of the weights of each edge,
 
 
 \begin{definition}
-Length of the longest path $\mathrm{L_{max}}(\cdot)$ from $u$ to $v$ is
+The length of~the longest path $\mathrm{L_{max}}(\cdot)$ from $u$ to $v$ is
 \begin{equation}
 	\mathrm{L_{max}}(u, v) = \max_{P \in \mathcal{P}_{u,v}}\mathrm{L}(P),
 \end{equation}
-where $\mathcal{P}_{u,v}$ is the set of all paths from $u$ to $v$.
+where $\mathcal{P}_{u,v}$ is the~set of~all paths from $u$ to $v$.
 \end{definition}
 
 \begin{remark}
-The length of the longest path can only be calculated for a graph without any positive length cycles, otherwise we could simply go in the cycle indefinitely to prolong the path \cite{gross2013handbook}.
+The length of~the longest path can only be calculated for a~graph without any positive length cycles, otherwise we could simply go in the~cycle indefinitely to prolong the~path \cite{gross2013handbook}.
 \end{remark}
 
 \subsubsection{Event graphs}
 \label{sec:event_graphs}
 
-In our model, we will use a weighted DAG that we call an \emph{event graph}, where each vertex corresponds to an event, edge direction assigns precedence of events and the weight of an edge will be corresponding to a minimal duration between events. All events share the origin $o$ which determines the start of the timeline, and it is used to calculate the time of each following event.
+In our model, we will use a~weighted DAG that we call an~\emph{event graph}, where each vertex corresponds to an~event, edge direction assigns precedence of~events and the~weight of~an~edge will be corresponding to a~minimal duration between events. All events share the~origin $o$ which determines the~start of~the timeline, and it is used to calculate the~time of~each following event.
 
-\paragraph{Example} Figure \ref{fig:event_graph} shows an event graph for 3 trains sharing resources. Edges $(o,\ a)$, $(o,\ g)$, and $(o,\ u)$ set the earliest start of the train, horizontal edges define the fastest passing of a section and diagonal edges ensure precedence for resources e.g. edge $(b,\ g)$ ensures that $g$ starts after $b$, since section $(a,\ b)$ required the same resource as $(g,\ h)$.
+\paragraph{Example} Figure \ref{fig:event_graph} shows an~event graph for 3 trains sharing resources. Edges $(o,\ a)$, $(o,\ g)$, and $(o,\ u)$ set the~earliest start of~the train, horizontal edges define the~fastest passing of~a~section and diagonal edges ensure precedence for resources e.g. edge $(b,\ g)$ ensures that $g$ starts after $b$, since section $(a,\ b)$ required the~same resource as $(g,\ h)$.
 
 
 \begin{figure}[htbp!]
@@ -267,44 +267,44 @@ In our model, we will use a weighted DAG that we call an \emph{event graph}, whe
 \end{center}
 \end{figure}
 
-The time of the event $x$ in the event graph can be calculated as the longest path from the origin $o$ to $x$, $\mathrm{T}(x) = \mathrm{L_{max}}(o,\ x)$.
+The time of~the event $x$ in the~event graph can be calculated as the~longest path from the~origin $o$ to $x$, $\mathrm{T}(x) = \mathrm{L_{max}}(o,\ x)$.
 
 
-Finding all the paths from $o$ to each $x \in V$ would be very expensive. Using DFS the complexity is exponential \cite{homer2011computability}.
+Finding all the~paths from $o$ to each $x \in V$ would be very expensive. Using DFS the~complexity is exponential \cite{homer2011computability}.
 
-First optimization is the use of Bellman principle \cite{light2024principle}\cite{bellman1952dynamic},
+First optimization is the~use of~Bellman principle \cite{light2024principle}\cite{bellman1952dynamic},
 
 \begin{equation}
 	\mathrm{T}(v) = \mathrm{L_{max}}(o,\ v) = \max_{u \in \inver(v)} \mathrm{L_{max}}(o,\ u) + w_{(u,\ v)}.
 \end{equation}
 
-This principle is used by the Floyd-Warshall algorithm \cite{floyd1962algo} and Dijkstra's algorithm \cite{Dijkstra1959} which are used for finding the shortest paths for all pairs of vertices and from a select starting vertex respectively. Both of them could be adjusted to find the longest path within polynomial complexity, $\mathrm{O}({|V|}^3)$ for Floyd-Warshall and $\mathrm{O}((|V| + |E|)log|V|)$ for Dijkstra with binary heap.
+This principle is used by the~Floyd-Warshall algorithm \cite{floyd1962algo} and Dijkstra's algorithm \cite{Dijkstra1959} which are used for finding the~shortest paths for all pairs of~vertices and from a~select starting vertex respectively. Both of~them could be adjusted to find the~longest path within polynomial complexity, $\mathrm{O}({|V|}^3)$ for Floyd-Warshall and $\mathrm{O}((|V| + |E|)log|V|)$ for Dijkstra with binary heap.
 
-Since we already use algorithm \ref{alg:toposort} to detect a cycle, we can just process the time of the events in the topological order, because topological order guarantees that any predecessors are already processed.
+Since we already use algorithm \ref{alg:toposort} to detect a~cycle, we can just process the~time of~the events in the~topological order, because topological order guarantees that any predecessors are already processed.
 
 \begin{definition}
-Critical path $\mathrm{CP}(\cdot)$ for vertex $v$ is the longest path from origin $o$ to $v$.
+Critical path $\mathrm{CP}(\cdot)$ for vertex $v$ is the~longest path from origin $o$ to $v$.
 \end{definition}
 
-Critical path limits the earliest start of event $v$, delaying any event along this path will also delay the event $v$,
+Critical path limits the~earliest start of~event $v$, delaying any event along this path will also delay the~event $v$,
 
 \begin{equation}
 	\mathrm{L}(\mathrm{CP}(v)) = \mathrm{T}(v).
 \end{equation}
 
 \begin{definition}
-Critical path edge $\mathrm{CPE}(\cdot)$ of $v$ is the last edge of the critical path for $v$.
+Critical path edge $\mathrm{CPE}(\cdot)$ of~$v$ is the~last edge of~the critical path for $v$.
 \end{definition}
 
-We can again use the Bellman principle to reconstruct the critical path,
+We can again use the~Bellman principle to reconstruct the~critical path,
 \begin{equation}
 	\mathrm{CP}(v) = \mathrm{CP}(u) \cup \{(u,\ v)\},\ \mathrm{CPE}(v) = (u,\ v).
 \end{equation}
 
-Algorithm \ref{alg:time} outputs the time $\mathrm{T}(\cdot)$ and critical path edge $\mathrm{CPE}(\cdot)$ for each vertex in the event graph. It runs in $\mathrm{O}(|V| + |E|)$ time complexity.
+Algorithm \ref{alg:time} outputs the~time $\mathrm{T}(\cdot)$ and critical path edge $\mathrm{CPE}(\cdot)$ for each vertex in the~event graph. It runs in $\mathrm{O}(|V| + |E|)$ time complexity.
 
 \begin{remark}
-In our event graph, the first vertex in the topological order will always be the origin $o$ as it is the only vertex $v$ with $\indeg(v) = 0$.
+In our event graph, the~first vertex in the~topological order will always be the~origin $o$ as it is the~only vertex $v$ with $\indeg(v) = 0$.
 \end{remark}
 
 \begin{algorithm}[float, caption={Time and critical path predecessor calculation}, label={alg:time}]
@@ -327,7 +327,7 @@ begin
 end
 \end{algorithm}
 
-\paragraph{Example} For event graph in figure \ref{fig:event_graph}, the time and critical path edge output from algorithm \ref{alg:time} is in table \ref{tab:time_crit}. So the vertices in the critical path for $a$ are ($o$, $a$, $b$, $c$), for $j$ are ($o$, $a$, $b$, $c$, $h$, $i$, $j$) and for $w$ are ($o$, $a$, $b$, $c$, $h$, $i$, $u$, $v$, $w$).
+\paragraph{Example} For event graph in figure \ref{fig:event_graph}, the~time and critical path edge output from algorithm \ref{alg:time} is in table \ref{tab:time_crit}. So the~vertices in the~critical path for $a$ are ($o$, $a$, $b$, $c$), for $j$ are ($o$, $a$, $b$, $c$, $h$, $i$, $j$) and for $w$ are ($o$, $a$, $b$, $c$, $h$, $i$, $u$, $v$, $w$).
 
 \begin{table}[htbp!]
 \begin{center}
