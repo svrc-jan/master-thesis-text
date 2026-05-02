@@ -4,3 +4,4 @@ subgraphs
 potention
 Decentralised
 acyclicity
+resultion

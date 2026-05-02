@@ -1,0 +1,33 @@
+\chapter{Discussion}
+\section{Aggregation}
+From tables \ref{tab:preprocess} and \ref{tab:preprocess_opt}, we can see that the aggregation of the initial data was successful. For all instances groups, except the \emph{swi}, the operation to level ratio was ranging from 1.46 to 2.84, this should provide a significant reduction in the number of necessary vertices when creating the event graph, or other similar structure where we can leverage the parallel events. In turn, the \emph{swi} group has an operation to route ration of 20.4, this means that these instance cannot be aggregated into parallel events, but instead have long stretching routes of many operations, that are aggregated into a single routing decision.
+
+The most significant is the ORR per chunk ratio. While the \emph{nor} and \emph{wab} instances had missing or negligent reductions, due to the fact that they assign each operation its separate resource, the 3.25 to 3.52 reduction ratios for \emph{smi} and \emph{swi} instance groups should provide a significant reduction in the number of conflicts that need to be resolved when scheduling. Because most combinatorial problems are considered NP-hard \cite{garey1979computers}, reducing the number of required decisions by factor of over 3 should result in much faster solution of these problems.
+
+From table \ref{tab:time_req} we can see that time to do these aggregation steps is negligent, even compared to the process if loading the instance data itself, thus it is always recommended to do them before doing any sort of further solving or analysis.
+
+The only questionable decision is regarding the use of parallel merges. While they may further reduce the number of necessary chunks, they also need more bookkeeping to track which parallel route we took. For a solution that dynamically updates the routing decision, it might be simpler to not merge the parallel chunks in favor of only increasing the number of chunks by a smaller percentage.
+
+\section{Link graph}
+The derivation of conditions for the linked conflicts in section \ref{sec:find_links} from the alterative graph formulation in \ref{sec:conf_links} via the use of the link graph is the main theoretical innovation presented in this thesis. We believe that it could be used to analyze and solve not only the train dispatching problem, but also any problem that uses resource in a blocking manner, like the blocking job-shop problem (BJSP).
+
+\begin{minipage}{\textwidth}
+We successfully use the link graph for both routing and conflict resolution, showing its potential as a useful tool. It is important to not that prebuilding the entire possible graph ahead of time to allow for continuous updates using operation bitmaps is relatively fast, as you can see from \ref{tab:time_req}, at maximum 8 times the amount of time to load the instance, usually faster.	
+\end{minipage}
+
+From the routing time you can see that querying the link graph for conflict chains and updating it is also relatively fast, certainly faster than augmenting and searching the entire alternative graph for inconsistent selections would be.
+
+\section{Routing}
+The top-down routing decisions based on opposite conflict chains have proven to be quite reasonable, the improvement in solution quality of the solution was can be clearly seen from table \ref{tab:solve}. While it did increase the time to solution for some of the groups, it also enabled us to solve the \emph{nor1\_full} and \emph{nor4} instances, which all timed out for the random routing assignment. The routing decisions are clearly motivated by the structure of problem and its safety implication of preventing trains going in the opposite direction to share resources.
+
+There is however one main drawback compared to the bottom-up approaches of the winning DISPLIB solutions, we do not refine the routes during the optimization. This causes us to be stuck in suboptimal routes, meaning that we only improve a current feasible solution by tightening the MIPGap parameter of the MILP solver. It is, however, unclear how to combine our top-down routing approach with refinement, as the bottom-up solutions just use the best current available route without any considerations to the overall structure of the problem, treating it as a black-box.
+
+\section{Conflict resolution}
+The path and cycle formulation has proven to be quite effective for the small and mid-sized instances, getting a conflict free solution within seconds or even milliseconds, this seems to be the main advantage over the big-M formulation, where it takes them a tens or hundreds of seconds to arrive at a solution \cite{Dubach2025handling}, showing a significant speed-up, at the cost of sometimes suboptimal solutions. It should be noted, that their solution also struggled with the same set of instances, \emph{nor5} and \emph{wab}, but not with the 3 larger instances in \emph{swi} as ours.
+
+The failure to solve the \emph{nor5} and \emph{wab} instance group also corresponds to the instances, where the resource chunk aggregation was not as efficient, causing an increase in the number of required conflicts to be resolved.
+
+While the gap to the best known solutions might seem high, it is important to note that these are solutions with unlimited time and computation resources and thus some gap is expected. The only other point we can compare our solution to is that only 8 teams in the competition are listed to have provided any solution to any instance to more than half of the instance groups.
+
+The main problem for the path-and-cycle formulation is the bloat of the MILP master problem, where we are adding even thousands of cuts which in turn slows down the solution significantly, even when using the lazy constraint principle. The biggest possible improvement for the speed of this optimization problem would be some sensible cut cleanup procedure that would remove the redundant cuts that are no longer necessary. We have made an effort to implement such a cleanup based on removal of non-binding or dominated cuts, but it hindered the performance of the solver as these updates were more time-consuming than just simply letting Gurobi lazy addition to deal with them.
+

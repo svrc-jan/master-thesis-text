@@ -17,10 +17,12 @@
 
 %%% Definice různých užitečných maker (viz popis uvnitř souboru)
 \input{makra}
+\input{parts/commands.tex}
+\bibliography{00references.bib}
 
 %%% Název práce v jazyce práce (přesně podle zadání)
 %%% Title of the thesis in the language used in the text (exact according to assignment)
-\def\NazevPrace{Heuristics for Real-Time Train Dispatching}
+\def\NazevPrace{Heuristics for real-time train dispatching}
 
 %%% Jméno autora
 %%% Author's name - First name Surname
@@ -69,8 +71,8 @@
 %%% The individual chapters of the thesis are stored in separate files for clarity
 {%
 \pagestyle{plain}
-\include{02content}
-\include{03shortcut}
+% \include{02content}
+% \include{03shortcut}
 % \include{doporuceni}
 % \include{uvod}
 }
@@ -80,13 +82,8 @@
 \include{12theory}
 \include{13method}
 \include{14results}
-\include{15conlusion}
-\include{dummy}
-% \include{tabulky-obrazky}
-% \include{prace-s-prameny}
-% \include{pdf-a}
-% \include{...}
-% \include{...}
+\include{15discussion}
+\include{16conlusion}
 {%
 \pagestyle{plain}
 \include{20bibliography}
@@ -99,8 +96,8 @@
 %%% least once in your own text. The appendices are numbered.
 \part*{\Prilohy\thispagestyle{empty}}
 \appendix
-\include{21app}
-\include{22app}
+\include{21ai_use}
+% \include{22app}
 % \include{...}
 % \include{...}
 

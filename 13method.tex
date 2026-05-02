@@ -547,7 +547,7 @@ It is important to note that the link is active if any of the transitions $(x, y
 \footnotesize \textit{Note:} Operations have their chunk sets. Chunk $a$ is blue, chunk $b$ is red. Transition link is at the top, direct link is at the bottom.
 \end{figure}
 
-\subsubsection{Conflicts and precedence}
+\subsection{Conflicts and precedence}
 A conflict $k = \{c_m, c_n\}$ is a pair of chunks $c_n$ and $c_m$ on the same resource $r = r_{c_m} = r_{c_n}$ and for different trains $m = \mathrm{train}(c_m) < \mathrm{train}(c_n) = n$.\footnote{We select $n < m$ to clearly define which train is first based on the precedence.} We resolve each conflict by assigning precedence $p_k = 1 - \bar{p}_{k}$, meaning that if $p_k = 1$, the resource $r$ will be released by $c_m$ before it is acquired by $c_n$, if $\bar{p}_k = 1$, the resource $r$ will be released by $c_n$ before it is acquired by $c_m$.
 
 We can model this situation using alternative graph where each vertex is an event (junction or level), each edge is an operation and the alternative pair is the precedence decision. Figure \ref{fig:conflict} shows the alternative graph for a conflict. By assigning precedence $p_k = 1$, we select edge $(j_m,\ i_n)$ from the alternative pair $((j_m,\ i_n),\ (j_n,\ i_m))$ and vice versa.
@@ -565,7 +565,8 @@ We can model this situation using alternative graph where each vertex is an even
 Without the information about the resources before and after the conflict, we cannot determine if the trains pass the resource in the same or opposite direction. This can be seen from \ref{fig:conflict} where both alternative graphs are equivalent.
 \end{remark}
 
-\subsubsection{Conflict links}
+\subsection{Conflict links}
+\label{sec:conf_links}
 Because the trains pass the chunks continuously and in a blocking manner, there are structural implication rules for precedence for conflicts on these neighboring chunks. This is discussed in \cite{dariano2008improving}, and we will paraphrase these rules here.
 
 There are two basic cases, trains going in the same (parallel) direction and trains going in the opposite direction. The first case was already shown in section \ref{sec:alt_graph}, but we will reiterate it here to show how the inferred selection in alterative graphs relates to the chunk precedence. The parallel case is shown in figure \ref{fig:conf_par}.
@@ -595,7 +596,8 @@ The second case is the opposite direction case, where trains pass the resources 
 \footnotesize \textit{Note:} Alternative edges are dotted. Chunks are in curly braces. Conflicts are distinguished by color.
 \end{figure}
 
-\subsubsection{Finding conflict links and chains}
+\subsection{Finding conflict links and chains}
+\label{sec:find_links}
 While the shown cases are trivial, in practice, we do know which direction the trains are passing\footnote{Trains might also be parallel in one section and opposite in another section of the track.}, so we need to use the forward and backward link graphs $\mathcal{F}$ and $\mathcal{G}$ to figure out the direction.
 
 \begin{remark}
@@ -844,10 +846,10 @@ While we could add multiple conflicts and/or multiple cuts per iteration, we are
 
 
 \subsubsection{Tuning the MILP optimizer}
-As there is a significant amount of cuts, we use a lazy constraint principle, where during the branch-and-bound procedure, each cut is treated as lazy and only added to the simplex table if it is violated. This is because by selecting a value for the precedence variable effectively disables all the cuts where the precedence variable has the opposite value, and thus they do not need to be considered. This significantly reduces the computational demand of the model and allows us to optimize models with thousands of cuts.
+As there is a significant amount of cuts, we use a lazy constraint principle, where during the branch-and-bound procedure, each cut is treated as lazy and only added to the simplex table if it is violated. This is because by selecting a value for the precedence variable effectively disables all the cuts where the precedence variable has the opposite value, and thus they do not need to be considered later in the search. This significantly reduces the computational demand of the model and allows us to optimize models with thousands of cuts.
 
 \begin{minipage}{\textwidth}
-We also increase the value of the mixed-integer programming gap \cite{gurobi}, to shorten the search to solutions that might not be optimal, but are good enough. If we have spare time, we decrease the gap after each run of the conflict resolution procedure in hopes of finding a better solution.
+We also increase the value of the mixed-integer programming gap (MIPGap)\cite{gurobi}, to shorten the search to solutions that might not be optimal, but are good enough. If we have spare time, we decrease the gap after each run of the conflict resolution procedure in hopes of finding a better solution.
 \end{minipage}
 
 

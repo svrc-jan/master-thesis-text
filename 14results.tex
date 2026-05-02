@@ -28,7 +28,7 @@ Table \ref{tab:preprocess} shows the aggregation counts, and the relative reduct
 \end{center}
 \end{table}
 
-Table \ref{tab:preprocess_opt} show
+Table \ref{tab:preprocess_opt} show additional percentages for the relevant instance group. First is the invalid transition junctions, it shows what percentage of junctions has an invalid transition; this is useful to see how many additional constrains we will need to make to prevent the invalid transitions. Second is the optional level, this is the maximum percentage of levels can be bypassed by an operation, it might be useful to choose another way of encoding the parallel events if there are too many optional levels. Third and forth are the direct and parallel merges, telling us how effective was each strategy of merging ORR to chunks. The \emph{nor} instance groups are omitted from table \ref{tab:preprocess_opt}, as they have all of these values at zero.
 
 \begin{table}[htbp!]
 \begin{center}
@@ -38,3 +38,28 @@ Table \ref{tab:preprocess_opt} show
 \end{center}
 \end{table}
 
+\section{Routing and conflict resolution}
+
+We set the timeout for the conflict resolution at 10 minutes, as was the initial value set by the DISPLIB. Table \ref{tab:solve} gives is multiple improvement percentages, comparing random and optimized routing assignments. First is how much was the total routing loss reduced by the routing procedure, second is how the final objective improved, and last is how much faster (or slower if negative) we arrived at a conflict free solution. It also includes the gap to the best know solution. The last value is the absolute time to the first conflict free solution to show the speed of the resolver. If conflict resolution procedure for the random assignment failed to solve the instance, we set the improvement as 100\%.
+
+\begin{table}[htbp!]
+\begin{center}
+\caption{Routing and conflict resolution}
+\label{tab:solve}
+\input{tables/solve_tab.tex}
+\end{center}
+\end{table}
+
+It is important to note that our conflict resolution procedure failed to solve 1 instance from the \emph{nor4} group, 3 instances from the \emph{swi} group and fail on all instances in the \emph{nor5} and \emph{wab} groups, within the 10 minutes. In total, we managed to solve 60\% of the instances. In the solved instances, 60\% of these were solved in 1 second from the start, and 42\% were solved within 100 milliseconds.
+
+\section{Time requirements}
+Table \ref{tab:time_req} shows how much time each step of the initial stage before conflict resolution takes. This includes loading of the instance, aggregation of the instance data, creation of the link graph and then routing optimization.
+
+\begin{table}[htbp!]
+\begin{center}
+\caption{Time requirements for initial stage}
+\label{tab:time_req}
+\input{tables/time_tab.tex}
+\end{center}
+\textit{Note:} All values are in milliseconds.
+\end{table}
