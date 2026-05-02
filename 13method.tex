@@ -606,7 +606,7 @@ The second case is the~opposite direction case, where trains pass the~resources 
 While the~shown cases are trivial, in~practice, we do know which direction the~trains are passing\footnote{Trains might also be parallel in~one section and~opposite in~another section of~the~track.}, so we need to~use the~forward and~backward link graphs $\mathcal{F}$ and~$\mathcal{G}$ to~figure out the~direction.
 
 \begin{remark}
-The main motivation for~the~link graph is that finding the~linked pairs of~conflicts exhaustively is computationally expensive, and~while the~inferred selection conditions in~the~literature are theoretically sufficient, they are impractical to~check for~problems of~the~size found in~the~DISPLIB.
+The main motivation for~the~link graph is that finding the~linked pairs of~conflicts exhaustively is computationally expensive, and~while the~inferred selection conditions in~the~literature are theoretically sufficient, they are impractical to~check for~problems of~the~size found in~DISPLIB.
 \end{remark}
 
 To find if there exists a~link between two conflicts $k_a = (a_m,\ a_n)$ and~$k_b = (b_m,\ b_n)$ we can check the~link graphs for~a~matching chunk links. So conflicts $k_a$ and~$k_b$ have a~parallel link if either of~the~following conditions hold:
@@ -763,8 +763,9 @@ This approach does not use the~big-M constraints that are often problematic \cit
 Instead, we use an~event graph which includes the~selected alternative edges from precedence decision, and~we add feasibility cuts to~prevent cycles and~to~enforce lower-bound on~delays based the~current precedence variables via the~critical path. This eliminates the~need for~big-M constraints, as~the~highest coefficients are the~lower-bounds for~the~delays. The main drawback for~this approach is that we may need to~add an~exponentially growing number of~cuts to~remove the~infeasible solutions. This is why we use the~link graph to~group these precedence decisions into chains to~reduce the~required number of~variables and~cycle cuts.
 
 \subsection{Event graph}
-To generate the~times of~each level, we employ an~event graph, where each level corresponds to~one vertex of~the~graph (plus the~origin). We add one edge for~each operation from its starting level to~its ending level with the~weight equal to~the~minimum duration of~the~operation. We also add one edge for~each conflict based on~the~current value of~the~precedence variable from the~end of~the~first chunk to~the~start of~the~second chunk with the~weight equal to~its release time. Figures \ref{fig:event_cycle} and~\ref{fig:event_path} show such event graph with both operation and~precedence edges.
+To generate the~times of~each level, we employ an~event graph, where each level corresponds to~one vertex of~the~graph (plus the~origin). We add one edge for~each active operation from its starting level to~its ending level with the~weight equal to~the~minimum duration of~the~operation. We also add one edge for~each conflict based on~the~current value of~the~precedence variable from the~end of~the~first chunk to~the~start of~the~second chunk with the~weight equal to~its release time. Figures \ref{fig:event_cycle} and~\ref{fig:event_path} show such event graph with both operation and~precedence edges.
 
+\newpage
 \subsection{Cycle cuts}
 The MILP problem can assign values of~precedence variables in~such a~way that the~selection of~alternative edges is inconsistent (there exists a~cycle in~the~graph). This situation is shown in~figure \ref{fig:event_cycle}, where alternative edges $(j,\ u)$, $(w,\ x)$ and~$(y,\ i)$ are part of~a cycle.
 
@@ -814,7 +815,7 @@ We iteratively discover the~conflicts by~finding the~first overlapping pair of~c
 
 Using the~chain reduces the~number of~necessary variables and~cycle constraints, because for~a~chain of~2 conflicts $a$ and~$b$, we would need 2 variables $p_a$ and~$p_b$ and~2 cycle cuts $p_a - p_b \leq 0$ and~$p_b - p_a \leq 0$. So for~each connection in~the~chain, we reduce the~number of~necessary variables by~one, and~the~number of~necessary cycle constraints by~two.
 
-An additional advantage is that using the~chain prevents resource swaps, as~only possible swap without overlapping chunk intervals has to~be on~the~same opposite conflict chain.
+An additional advantage is that using the~conflict chain prevents resource swaps, as~only possible swap between two pairs of chunks must have their corresponding conflicts on~the~same conflict chain.
 
 \subsection{MILP model}
 The complete MILP model that is optimized in~each step is the~following:
@@ -832,22 +833,22 @@ The conflict resolution procedure is done in~the~following steps:
   \item Optimize the~current MILP model.
   \item Update the~graph with current precedence values.
   \item If graph contains a~cycle, add the~cycle cut (eq. \ref{eq:cycle_cut}) for~the~smallest set $\Pi_C$. Go to~step 1.
-  \item If any delays violate the~conditional lower-bound, add a~path cut (eq. \ref{eq:path_cut} or \ref{eq:impl_cut}) for~the~most violated delay. Go to~step 1.
+  \item If any delay variable violates the~conditional lower-bound, add a~path cut (eq. \ref{eq:path_cut} or \ref{eq:impl_cut}) for~the~most violated delay. Go to~step 1.
   \item Check if there are any conflicts in~the~chunk intervals. If yes, add the~whole chain for~the~earliest conflict. Go to~step 1.
   \item Stop, we have a~conflict free selection of~precedences.
 \end{enumerate}
 
-To better illustrate how the~procedure works, figure \ref{fig:solver_diagram} show a~diagram of~what each component of~the~conflict resolution procedure provides for~the~others.
+To better illustrate how the~procedure works, figure \ref{fig:solver_diagram} shows a~diagram of~what each component of~the~conflict resolution procedure provides for~the~others, including the route planner.
 
 \begin{figure}[htbp!]
 \caption{Conflict resolution diagram}
 \label{fig:solver_diagram}
 \begin{center}
-\includegraphics[width=0.6\textwidth]{img/solver_diagram.pdf}
+\includegraphics[width=0.8\textwidth]{img/solver_diagram.pdf}
 \end{center}
 \end{figure}
 
-While we could add multiple conflicts and/or multiple cuts per iteration, we are trying to~limit the~number conflicts and~cuts, so the~MILP model does not get bloated and~thus slows down. This is why we only add one cut or conflict per iteration and~utilize the~previous solution as~a~warm start, speeding up the~computation.
+While we could add multiple conflicts and/or multiple cuts per iteration, we are trying to~limit the~number conflicts and~cuts to only the necessary amount, so the~MILP model does not get bloated and~thus slows down. This is why we only add one cut or conflict per iteration and~utilize the~previous solution as~a~warm start, speeding up the~computation.
 
 
 \subsubsection{Tuning the~MILP optimizer}
