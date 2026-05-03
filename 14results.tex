@@ -2,14 +2,14 @@
 \label{chap:results}
 
 \subsubsection{Software and~hardware}
-The implementation is done in \emph{C++} language \cite{cpp23}, using \emph{Gurobi} \cite{gurobi} as~the~MILP solver for both routing and~conflict resolution. The~source code is available from~\url{https://github.com/svrc-jan/train-opt}. All computations are done on a~computer with 
+All procedures are implemented in~the~\emph{C++} language \cite{cpp23}, using \emph{Gurobi} \cite{gurobi} as~the~MILP solver for both routing and~conflict resolution. The~source code is available from~\url{https://github.com/svrc-jan/train-opt}. All computations are done on a~computer with 
 i7-9700F CPU and~16 GB of~RAM. 
 
 \subsubsection{Instance grouping}
-Because the~DISPLIB library has 112 instances, we split them into 10 groups with approximately the~same size (9 to~16 instances per group) based on their initial source (encoded in the~name), which also corresponds to~the~structure of~the~problem. Unless specified otherwise, the~presented results are the~median across the~instances inside the~group. We feel that this number should be a~good representation of~the~results as~it is not be skewed by~a~single instance within the~group and~thus provide us with a~valid overview that can still be distinguished between the~groups.	
+Because the~DISPLIB library has 112 instances, we split them into 10 groups with approximately the~same size (9 to~16 instances per~group) based on their initial source (encoded in~the~name), which also corresponds to~the~structure of~the~problem. Unless specified otherwise, the~presented results are the~median across the~instances inside the~group. We feel that this number should be a~good representation of~the~results as~it is not skewed by~a~single instance within the~group and~thus provide us with a~valid overview that can still be compared across the~groups.	
 
 \section{Aggregation}
-To gauge how well the aggregation of~the~instance data worked, table \ref{tab:instance} presents the~initial instance data counts. We can see that the~instances vary in size, with respect to~the~number of~trains, operations, resources, etc. The~most significant is the~difference between the~number of~operations compared to~the~number of~operation-to-resource relations (ORR, sum of~the~number of~required resources for each operation). While the~\emph{nor} instances assign at~most one resource to~a~single operation, the~other instances allow multiple resources per operation.
+To gauge how well the aggregation of~the~instance data worked, Table \ref{tab:instance} presents the~initial instance data counts. We can see that the~instances vary in~size, with respect to~the~number of~trains, operations, resources, etc. The~most significant difference is between the~number of~operations compared to~the~number of~operation-to-resource relations (ORR, sum of~the~number of~required resources for each operation). While the~\emph{nor} instances assign at~most one resource to~a~single operation, the~other instances allow multiple resources per~operation.
 
 \begin{table}[htbp!]
 \begin{center}
@@ -19,7 +19,7 @@ To gauge how well the aggregation of~the~instance data worked, table \ref{tab:in
 \end{center}
 \end{table}
 
-Table \ref{tab:preprocess} shows the~aggregation counts, and~the~relative reductions compared to~the~initial data. We provide the~relative improvements to~see how well the~aggregation procedure reduced the~count of~the~required objects. For example, the~operation per level ratio gives how many fewer vertices we need in the~event graph compared to~using each operation as~a~vertex, i.e. how much we can parallelize the~events. Similarly, the~objective per route ratio gives how many fewer routing decisions we need to~make compared to~naively having a~decision (most likely a~binary variable) for each operation. The~most impactful is probably the~ORR per chunk ratio, as~grouping the~related resource conflicts is going to~have a~direct impact on how many conflicts we need to~resolve to~get a~conflict free solution.
+Table \ref{tab:preprocess} shows the~aggregation counts, and~the~relative reductions compared to~the~initial data. We provide the~relative improvements to~see how well the~aggregation procedure reduced the~count of~the~required objects. For example, the~operation-to-level ratio gives how many fewer vertices we need in~the~event graph compared to~using each operation as~a~vertex, i.e. how much we can parallelize the~events. Similarly, the~operation-to-route ratio gives how many fewer routing decisions we need to~make compared to~naively having a~decision (most likely a~binary variable) for each operation. The~most impactful is probably the~ORR-to-chunk ratio, as~grouping the~related resource conflicts is going to~have a~direct impact on how many conflicts we need to~resolve to~get a~conflict free solution.
 
 \begin{table}[htbp!]
 \begin{center}
@@ -29,7 +29,7 @@ Table \ref{tab:preprocess} shows the~aggregation counts, and~the~relative reduct
 \end{center}
 \end{table}
 
-Table \ref{tab:preprocess_opt} shows additional percentages for the~relevant instance group. First is the~invalid transition junctions. It shows what percentage of~junctions has an invalid transition; this is useful to~see how many additional constraints we need to~make to~prevent the~invalid transitions. Second is the~optional level; this is the~maximum percentage of~levels that can be bypassed by~an operation, it might be useful to~choose another way of~encoding the~parallel events if there are too many optional levels. Third and~forth are the~direct and~parallel merges; telling us how effective each strategy is at~merging ORR to~chunks. The~\emph{nor} instance groups are omitted from~table \ref{tab:preprocess_opt}, as~they have all of~these values at~zero.
+Table \ref{tab:preprocess_opt} shows additional percentages for each relevant instance group. First is the~invalid transition junctions. It shows what percentage of~junctions has an invalid transition; this is useful to~see how many additional constraints we need to~make to~prevent the~invalid transitions. Second is the~optional level; this is the~maximum percentage of~levels that can be bypassed by~an operation, it might be useful to~choose another way of~encoding the~parallel events if there are too many optional levels. Third and~fourth are the~direct and~parallel merges; telling us how effective each strategy is at~merging ORR into~chunks. The~\emph{nor} instance groups are omitted from~Table \ref{tab:preprocess_opt}, as~they have all of~these values at~zero.
 
 \begin{table}[htbp!]
 \begin{center}
@@ -41,7 +41,7 @@ Table \ref{tab:preprocess_opt} shows additional percentages for the~relevant ins
 
 \section{Routing and~conflict resolution}
 
-We set the~timeout for the~conflict resolution at~10 minutes, as~is the~initial value set by~DISPLIB. Table \ref{tab:solve} gives multiple improvement percentages, comparing random and~optimized routing assignments. First is how much is the~total routing loss reduced by~the~routing procedure, second is how the~final objective improved, and~last is how much faster (or slower if~negative) we arrived at~a~conflict free solution. It also includes the~gap to~the~best-known solution. The~last value is the~absolute time to~the~first conflict free solution to~show the~speed of~the~conflict resolution procedure. If the~conflict resolution procedure for the~random routing assignment failed to~solve the~instance, we set the~improvement at~100\%.
+We set the~timeout for the~conflict resolution at~10 minutes, as~is the~initial value set by~DISPLIB. Table \ref{tab:solve} gives multiple improvement percentages, comparing random and~optimized routing assignments. First is how much does the~routing procedure reduce the~total routing loss, second is how the~final objective improved, and~last is how much faster (or slower if~negative) we arrived at~a~conflict free solution. It also includes the~gap to~the~best-known solution. The~last value is the~absolute time to~the~first conflict free solution to~show the~speed of~the~conflict resolution procedure. If~the~conflict resolution procedure for the~random routing assignment timed out without a~solution for~the~instance, we set the~improvement at~100\%.
 
 \begin{table}[htbp!]
 \begin{center}
@@ -51,9 +51,11 @@ We set the~timeout for the~conflict resolution at~10 minutes, as~is the~initial 
 \end{center}
 \end{table}
 
-It is important to~note that our conflict resolution procedure failed to~solve 1 instance from~the~\emph{nor4} group, 3 instances from~the~\emph{swi} group and~failed on all instances in the~\emph{nor5} and~\emph{wab} groups, within the~10 minutes. In~total, we manage to~solve 60\% of~the~instances. In~the~solved instances, 60\% of~these are solved in 1 second from~the~start, and~42\% are solved within 100 milliseconds.
+It is important to~note that our conflict resolution procedure failed to~solve 1 instance from~the~\emph{nor4} group, 3 instances from~the~\emph{swi} group and~failed on all instances in~the~\emph{nor5} and~\emph{wab} groups, within the~10 minutes. In~total, we managed to~solve 60\% of~the~instances. In~the~solved instances, 60\% of~these are solved in~1 second from~the~start, and~42\% are solved within 100 milliseconds.
 
-All the~best-known solutions from~\emph{swi} group have zero delay, this is why the~best-known gap in \ref{tab:solve} for \emph{swi} is 100\%, even though our solutions have small delays, relative to~the~overall train durations.
+\begin{remark}
+All the~best-known solutions from~\emph{swi} group have zero delay, this is why the~best-known gap in~Table \ref{tab:solve} for \emph{swi} is 100\%, even though our solutions have small delays, relative to~the~overall train durations.	
+\end{remark}
 
 \section{Time requirements}
 Table \ref{tab:time_req} shows how much time each step of~the~initial stage before conflict resolution takes place. This includes loading of~the~instance, aggregation of~the~instance data, creation of~the~link graph and~then the~routing optimization.
@@ -64,5 +66,5 @@ Table \ref{tab:time_req} shows how much time each step of~the~initial stage befo
 \label{tab:time_req}
 \input{tables/time_tab.tex}
 \end{center}
-\textit{Note:} All values are in milliseconds.
+\textit{Note:} All values are in~milliseconds.
 \end{table}
