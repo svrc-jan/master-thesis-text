@@ -41,7 +41,7 @@ Table \ref{tab:preprocess_opt} shows additional percentages for the~relevant ins
 
 \section{Routing and~conflict resolution}
 
-We set the~timeout for the~conflict resolution at~10 minutes, as~is the~initial value set by~DISPLIB. Table \ref{tab:solve} gives multiple improvement percentages, comparing random and~optimized routing assignments. First is how much is the~total routing loss reduced by~the~routing procedure, second is how the~final objective improved, and~last is how much faster (or slower if~negative) we arrived at~a~conflict free solution. It also includes the~gap to~the~best-known solution. The~last value is the~absolute time to~the~first conflict free solution to~show the~speed of~the~resolver. If conflict resolution procedure for the~random assignment failed to~solve the~instance, we set the~improvement at~100\%.
+We set the~timeout for the~conflict resolution at~10 minutes, as~is the~initial value set by~DISPLIB. Table \ref{tab:solve} gives multiple improvement percentages, comparing random and~optimized routing assignments. First is how much is the~total routing loss reduced by~the~routing procedure, second is how the~final objective improved, and~last is how much faster (or slower if~negative) we arrived at~a~conflict free solution. It also includes the~gap to~the~best-known solution. The~last value is the~absolute time to~the~first conflict free solution to~show the~speed of~the~conflict resolution procedure. If the~conflict resolution procedure for the~random routing assignment failed to~solve the~instance, we set the~improvement at~100\%.
 
 \begin{table}[htbp!]
 \begin{center}
@@ -56,7 +56,7 @@ It is important to~note that our conflict resolution procedure failed to~solve 1
 All the~best-known solutions from~\emph{swi} group have zero delay, this is why the~best-known gap in \ref{tab:solve} for \emph{swi} is 100\%, even though our solutions have small delays, relative to~the~overall train durations.
 
 \section{Time requirements}
-Table \ref{tab:time_req} shows how much time each step of~the~initial stage before conflict resolution takes. This includes loading of~the~instance, aggregation of~the~instance data, creation of~the~link graph and~then the~routing optimization.
+Table \ref{tab:time_req} shows how much time each step of~the~initial stage before conflict resolution takes place. This includes loading of~the~instance, aggregation of~the~instance data, creation of~the~link graph and~then the~routing optimization.
 
 \begin{table}[htbp!]
 \begin{center}

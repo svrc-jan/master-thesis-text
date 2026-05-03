@@ -10,9 +10,9 @@ Traditionally, scheduling was done manually by humans; only with the~advancement
 \section{Goals}
 The main goal of~this thesis is to develop a heuristic that is capable of~train dispatching in~real-time with interpretable results; a human should be able to understand the~structure of~the~result to verify its validity.
 
-The heuristic is be evaluated on~the~\emph{DISPLIB}\@: Train dispatching benchmark library \cite{kloster2025displiblibrarytraindispatching} consisting of~train dispatching problem (TDP) instances from real-world data. This library of~instances was introduced for~an optimization competition.
+The heuristic is evaluated on~the~\emph{DISPLIB} train dispatching benchmark library \cite{kloster2025displiblibrarytraindispatching} consisting of~train dispatching problem (TDP) instances from real-world data. This library of~instances was introduced for~an optimization competition.
 
-A significant part of~this thesis is focused on~the~aggregation and the~structural analysis of~the~TDP as presented in~\emph{DISPLIB}. This is the~main innovation which allows us to use a top-down approach, reducing the~problem to selecting the~routes top-down and~then scheduling the~trains with a more concise model, as opposed to the~bottom-up approach, building up the~solutions by sequentially routing and~resolving conflicts, which is used by the~winning solutions in~the~\emph{DISPLIB} competition.
+A significant part of~this thesis is focused on~the~aggregation and the~structural analysis of~the~TDP as presented in~DISPLIB. This is the~main innovation which allows us to use a top-down approach, reducing the~problem to selecting the~routes top-down and~then scheduling the~trains with a more concise model, as opposed to the~bottom-up approach, building up the~solutions by sequentially routing and~resolving conflicts, which is used by the~winning solutions in~the~DISPLIB competition.
 
 \section{Thesis structure}
 \begin{minipage}{\textwidth}
@@ -21,11 +21,11 @@ This thesis is structured in~the~following chapters with their contents:
 \begin{enumerate}
 	\item \hyperref[chap:intro]{\emph{Introduction:}} Outlines the~motivation, goals, and~structure of~this thesis.
 	%\hyperref[chap:lit_rev]
-	\item \hyperref[chap:lit_rev]{\emph{Literature review:}} Review of~the~pertinent literature separated into three parts, literature connected to~\emph{DISPLIB}, the~most relevant resources inspiring the~heuristic or~providing key theoretical ideas, and~an overview of~the~selected state-of-the-art in~scheduling optimization.
-	\item \hyperref[chap:theor]{\emph{Theoretical background:}} Basic theory necessary for~the~description of~the~problem. The~main focus is on~graph topology and~the~use of~alternative and~disjunctive graphs for~scheduling models.
-	\item \hyperref[chap:method]{\emph{Methodology:}} Detailed description of~the~problem, aggregation, routing and~conflict resolution.
-	\item \hyperref[chap:results]{\emph{Results:}} Presentation of~the~performance of~the~procedures described in~methodology on~the~\emph{DISPLIB} instances.
-	\item \hyperref[chap:discuss]{\emph{Discussion:}} Discussion of the ideas and procedures presented in the methodology chapter and discussion of~results.
+	\item \hyperref[chap:lit_rev]{\emph{Literature review:}} Review of~the~pertinent literature separated into three parts, literature connected to~DISPLIB, the~most relevant resources inspiring the~heuristic or~providing key theoretical ideas, and~an overview of~the~selected state-of-the-art in~scheduling optimization.
+	\item \hyperref[chap:theor]{\emph{Theoretical background:}} Basic theory necessary for~the~description of~the~problem. The~main focus is on~graph topology and~the~use of~alternative and~weighted graphs for~scheduling models.
+	\item \hyperref[chap:method]{\emph{Methodology:}} Detailed description of~the~train dispatching problem, aggregation, routing, and~conflict resolution.
+	\item \hyperref[chap:results]{\emph{Results:}} Presentation of~the~performance of~the~procedures described in~methodology on~the~DISPLIB instances.
+	\item \hyperref[chap:discuss]{\emph{Discussion:}} Discussion of the ideas and procedures presented in the methodology chapter and discussion of~the~results.
 	\item \hyperref[chap:concl]{\emph{Conclusion:}} Highlights of~the~main ideas presented in~this thesis and overall evaluation, future work considerations.
 \end{enumerate}
 \end{minipage}

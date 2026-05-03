@@ -4,7 +4,7 @@
 \section{Problem description}
 Most of~the~problem description is taken from the~\emph{DISPLIB format specification} \cite{kloster2025displibspec}; a~concise explanation is in~the~accompanying paper \cite{kloster2025displiblibrarytraindispatching}.
 
-Each instance in~the~\emph{DISPLIB} library consists of~a set of~trains and~an~objective to~be minimized. All data is presented in~JSON format \cite{pezoa2016foundations}. Each train is defined by~an~operation graph which is a~DAG. Each operation in~the~graph has the~following content:
+Each instance in~the~DISPLIB library consists of~a set of~trains and~an~objective to~be minimized. All data is presented in~JSON format \cite{pezoa2016foundations}. Each train is defined by~an~operation graph, which is a~DAG. Each operation in~the~graph has the~following properties:
 
 \begin{itemize}
     \item minimal duration
@@ -24,7 +24,7 @@ All operation graphs have one entry (start) operation, with no predecessors, and
 
 Resources are anything that is required by~the~operation, typically physical sections of~the~railway network. Resources can only be used by~one operation at~a~time and~are released after the~end of~the~operation that uses it plus the~defined release time.
 
-The minimized objective is defined by~objectives components, each with the~following content 
+The minimized objective is defined by~objective components, each with the~following properties: 
 
 \begin{itemize}
     \item train
@@ -38,9 +38,7 @@ The minimized objective is defined by~objectives components, each with the~follo
 While the~format allows both coefficient and~increment to~be non-zero, in~practice none of~the~instances combine both in~one objective component.
 \end{remark}
 
-Data \ref{data:obj} shows an~example of~an objective component entry in~the~instance JSON.
-
-The total objective delay $\Delta$ is defined as~a~sum of~components for~active operations only,
+Data \ref{data:obj} shows an~example of~an objective component entry in~the~instance JSON. The total objective delay $\Delta$ is defined as~a~sum of~components for~active operations only,
 
 \begin{equation}
 \Delta = \sum_{o \in O_{a,\Delta}} c_o \max\{0, t_o - \bar{t}_o\} + d_o H(t_o - \bar{t}_o),
@@ -55,9 +53,9 @@ A solution to~the~problem is a~sequence of~events, each event entry corresponds 
     \item time
 \end{itemize}
 
-The solution is also presented in~a~JSON format, data \ref{data:events} shows a~truncated solution example. To reiterate, the~end event of~an operation is the~start event of~its successor.
+The solution is also presented in~a~JSON format, data \ref{data:events} shows a~truncated solution example. To reiterate, the~end event of~an operation is the~start event of~its successor. A feasible solution for an instance meets the following requirements:
 
-\begin{displaycquote}[Feasible solution requirements in~\emph{DISPLIB} format specification]{kloster2025displibspec}
+\begin{displaycquote}[Feasible solution requirements in~DISPLIB format specification]{kloster2025displibspec}
     \begin{itemize}
         \item The sequence of~events is given in~chronological order, i.e., the~time of~each event is greater than or equal to~the~time of~all preceding events.
         \item The subsequence of~operations applying to~each train forms a~path through that train’s operations graph, starting at~the~entry operation and~ending at~the~exit operation.
@@ -76,6 +74,7 @@ The solution is also presented in~a~JSON format, data \ref{data:events} shows a~
     \end{itemize}
 \end{displaycquote}
 
+\newpage
 While the~events in~the~solution have a~time, their order in~the~events list is still significant, as~they define in~which order the~resources are unlocked and~locked. This is to~prevent a~resource swap situation described in~section \ref{sec:swap}.
 
 \subsection{Example problem}
@@ -93,7 +92,7 @@ To illustrate the~format we have prepared an~example problem, the~railway networ
 The corresponding operation graph for~train 0 (first) is in~figure \ref{fig:train_dag}, JSON entry for~operation 4 is in~data \ref{data:op}, and~JSON entry for~objective component for~the~last operation is in~data \ref{data:obj}.
 
 \begin{figure}[htbp!]
-\caption{Operation graph for~train 0}
+\caption{Operation graph for a train}
 \label{fig:train_dag}
 \begin{center}
 \includegraphics[width=\textwidth]{img/train_dag.pdf}
@@ -201,11 +200,11 @@ Aside from more natural representation of~using vertices as~single events and~ed
 To aggregate the~variables into junctions, we use a~\emph{disjoint set} \cite{GallerFischer1964}. It is often called the~\emph{union-find} data structure. Its use is to~partition elements into non-overlapping (disjoint) sets. It has two basic operations:
 \begin{itemize}
     \item \emph{Find:} Unary operation, returns to~which set the~item belongs, usually by~returning the~representative element.
-    \item \emph{Union:} Binary operation, if the~two elements belong to~different sets, it joins them together.
+    \item \emph{Union:} Binary operation, if the~two elements belong to~different sets, it merges them together.
 \end{itemize}
 \end{minipage}
 
- In~short, each element has a~parent entry, which is initialized at~the~start to~itself and~the~representative element of~a~set always has the~parent as~itself. To get the~representative we traverse the~tree upwards via parent entries until we find the~representative. When we use the~union operation on~two elements from different sets, the~representative of~one becomes a~representative of~the~other (if they belong to~the~same set nothing happens). 
+ In~short, each element has a~parent entry, which is initialized at~the~start to~itself and~the~representative element of~a~set always has the~parent as~itself. To get the~representative we traverse the~tree upwards via the~parent entries until we find the~representative. When we use the~union operation on~two elements from different sets, the~representative of~one becomes a~representative of~the~other (if they belong to~the~same set nothing happens). 
 
 To optimize the~data structure we use path compression (flattening of~the~parent tree by~assigning the~parent of~the~element to~its parent when traversing the~tree) and~union by~size (always attaching smaller tree to~bigger tree) \cite{Tarjan1975}. Both operations with optimizations are in~algorithms \ref{alg:disjset_find} and~\ref{alg:disjset_union}.
 
@@ -265,7 +264,7 @@ We could have a~possible situation where the~set of~outgoing operations $\outedg
 An example of~such invalid transition is in~figure \ref{fig:junct_invalid}, where the~transition (2, 3) in~the~third junction is invalid.
 
 \begin{figure}[htbp!]
-\caption{Operation graph junction graph for~invalid transition}
+\caption{Operation graph and junction graph for~invalid transition}
 \label{fig:junct_invalid}
 \begin{center}
 \includegraphics[width=.7\textwidth]{img/junction_invalid.pdf}
@@ -297,17 +296,17 @@ Each level $L$ consists of~set of~junctions $j \in L$ that are parallel and~thus
 Each operation also has a~starting (source) level and~ending (target) level based on~its starting (source) and~ending (target) junction,
 
 \begin{align}
-\src_{\mathrm{level}}(o) &= L \iff \src_{\mathrm{junct}}(o) \in L \\
-\tar_{\mathrm{level}}(o) &= L \iff \tar_{\mathrm{junct}}(o) \in L
+\src_{\mathrm{level}}(o) &= L \iff \src_{\mathrm{junct}}(o) \in L, \\
+\tar_{\mathrm{level}}(o) &= L \iff \tar_{\mathrm{junct}}(o) \in L.
 \end{align}
 
 The start (source) level contains only the~start (source) junction, and~the~end (sink) level contains only the~end (sink) junction.
 
 \subsubsection{Required and~optional levels}
-Not all levels need to~be passed when traversing the~graph. Such levels we call optional, the~levels that have to~be passed when traversing the~graph we call required. {\textcite{Dubach2025handling}} use the~concept of~required levels to~generate bound constraints. We use required levels to~identify border levels, which are used to~create routing sections in~\ref{sec:sections}.  In~the~example from figure \ref{fig:level} the~grayed-out levels are optional, because they can be bypassed by~an~operation.
+Not all levels need to~be passed when traversing the~graph. Such levels we call optional, and the~levels that have to~be passed when traversing the~graph we call required. {\textcite{Dubach2025handling}} use the~concept of~required levels to~generate bound constraints. We use required levels to~identify border levels, which are used to~create routing sections in~\ref{sec:sections}.  In~the~example from figure \ref{fig:level} the~grayed-out levels are optional, because they can be bypassed by~an~operation.
 
 \subsubsection{Topological generations}
-To aggregate the~junctions into levels, we use the~concept of~\emph{topological generations} \cite{Hagberg:2008:NetworkX}. To create these generations we use adjusted Kahn's algorithm for~topological sorting \cite{Kahn:1962:Topological}, where we group all junctions (vertices) currently without incoming operations (edges) into a~level as~shown in~algorithm \ref{alg:topogen}.
+To aggregate the~junctions into levels, we use the~concept of~\emph{topological generations} \cite{Hagberg:2008:NetworkX}. To create these generations we use an~adjusted version of the~Kahn's algorithm for~topological sorting \cite{Kahn:1962:Topological}, where we group all junctions (vertices) currently without incoming operations (edges) into a~level as~shown in~algorithm \ref{alg:topogen}.
 
 \begin{algorithm}[float, caption={Topological generation algorithm}, label={alg:topogen}]
 input: junction graph $G(J,\ O)$, junctions $J$ (vertices), operations $O$ (edges)
@@ -319,7 +318,7 @@ begin
   end
 
   $k \gets 0$
-  $Z \gets \{J_0\}$
+  $Z \gets \{j_\mathrm{start}\}$
 
   while $Z \neq \emptyset$
     $L_k \gets Z$
@@ -378,12 +377,12 @@ This assignment of~routes also generates a~set of~routing junctions (junction is
 \begin{equation}
 \label{eq:flow}
 \sum_{R \in \rho_{\mathrm{in}}(j)} z_R - \sum_{R \in \rho_{\mathrm{out}}(j)} z_R = \begin{cases}
-    1 & \text{if $j$ is a~start (source) junction} \\
-    -1 & \text{if $j$ is an~end (sink) junction} \\
+    -1 & \text{if $j$ is a~start (source) junction} \\
+    1 & \text{if $j$ is an~end (sink) junction} \\
     0 & \text{otherwise}
 \end{cases},
 \end{equation}
-where $z_R$ is the~activation of~$R$, $\rho_{\mathrm{in}}(j)$ is a~set of~incoming routes and~$\rho_{\mathrm{in}}(j)$ is a~set of~outgoing routes for~junction $j$.
+where $z_R$ is the~activation of~$R$, $\rho_{\mathrm{in}}(j)$ is a~set of~incoming routes and~$\rho_{\mathrm{out}}(j)$ is a~set of~outgoing routes for~junction $j$.
 
 For non-routing junctions, the~constraint is redundant as~it has only one incoming and~one outgoing route which are the~same.
 
@@ -391,7 +390,7 @@ For non-routing junctions, the~constraint is redundant as~it has only one incomi
 For each train we iterate over operations in~topological order and~assign them the~same route if it is the~only successor of~its only predecessor, otherwise we create a~new route. Procedure follows algorithm \ref{alg:route}.
 
 \begin{algorithm}[float=htbp!, caption={Route assignment}, label={alg:route}]
-input: operations $O = (o_0,\ \dots\ o_n)$ in~topological order
+input: operations $O = (o_0,\ \dots\ o_n)$ in topological order
 output: route assignment $R: O \rightarrow \mathbb{Z}_0^+$
 
 begin
@@ -424,7 +423,7 @@ To separate what routing decisions are connected to~each other and~which are ind
 \end{figure}
 
 
-\subsection{Border levels}
+\subsubsection{Border levels}
 Border level is a~level that meets the~following conditions:
 \begin{itemize}
   \item[(a)] The level is required.
@@ -475,16 +474,16 @@ For each train we do the~following:
 
 \subsubsection{Example}
 
- In~the~example from figure \ref{fig:section} we can see that L1 satisfies conditions (c), and~(d) for~a~border level, but it is not required, and~its junction is non-routing, so it does not satisfy condition (a) and~(b).
+ In~the~example from figure \ref{fig:section}, we can see that L1 satisfies conditions (c) and~(d) for~a~border level, but it is not required, and~its junction is non-routing, so it does not satisfy condition (a) and~(b).
 
-We can also see that L3 satisfies conditions (a), (c), and~(d), but again, its junction is non-routing, so  (b) is not satisfied.
+We can also see that L3 satisfies conditions (a), (c), and~(d), but again, its junction is non-routing, so (b) is not satisfied.
 
-Levels L5 and~L6 satisfy (a) and~(b), but (c) and~(d) are not satisfied. This is because the~top and~bottom outgoing operations of~L4 have different disjunct successor sets thus different ending junctions, and, respectively, the~top and~bottom incoming operations of~L7 have disjunct predecessor sets and~thus different junctions as~well.
+Levels L5 and~L6 satisfy (a) and~(b), but (c) and~(d) are not satisfied. This is because the~top and~bottom outgoing operations of~L4 have different disjoint successor sets thus different ending junctions, and, respectively, the~top and~bottom incoming operations of~L7 have disjunct predecessor sets and~thus different junctions as~well.
 
 \subsection{Resource chunks}
 So far we have only done aggregation based on~the~operations and~their successors. Now we do aggregation based on~the~resources. While this is inspired by~\textcite{Dubach2025handling}, the~implementation may differ as~the~authors did not provide us with sufficient details, only the~conditions that are used to~create the~chunks.
 
-The goal is to~merge the~resource uses of~the~same resource for~directly connected operations (by predecessor and~successor sets) as~well as~merge parallel uses of~the~resource. What we do not want to~group is reentries of~resource, where on~train acquires a~resource, releases it, and~then acquires it again. Figure \ref{fig:chunks} shows an~example of~how operations using the~same resource are merged.
+The goal is to~merge the~resource uses of~the~same resource for~directly connected operations (by predecessor and~successor sets) as~well as~merge parallel uses of~the~resource. What we do not want to~group is reentries of~resource, where one~train acquires a~resource, releases it, and~then acquires it again. Figure \ref{fig:chunks} shows an~example of~how operations using the~same resource are merged.
 
 \begin{figure}[htbp!]
 \caption{Resource chunks}
@@ -499,49 +498,49 @@ The (B) case in~figure \ref{fig:chunks} shows an~invalid chunk, where the~operat
 
 While direct merges might feel sufficient, in~the~following section \ref{sec:link_graph}, we are creating a~data structure that grows with the~amount of~chunks, so reducing the~number of~possible chunks is helpful to~reduce the~requirements of~said structure.
 
-Each chunk $c = (r_c,\ O_c)$ is defined by~the~source $r_c$ and~its set of~operations $O_c$. We say that the~chunk is active if any of~the~operations $o \in O_c$ are active. Each operation $o$ also has its set of~chunk $C_o$, one chunk for~each resource it requires.
-
-Chunk $c$ is active $z_c = 1$ if and~only if any of~the~operations $o \in O_c$ are active,
+Each chunk $c = (r_c,\ O_c)$ is defined by~the~source $r_c$ and~its set of~operations $O_c$. Chunk $c$ is active $z_c = 1$ if and~only if any of~the~operation $o \in O_c$ is active,
 
 \begin{equation}
   z_c = 1 \iff \exists o \in O_c,\ z_o = 1.
 \end{equation}
 
-The start of~chunk is the~start of~its first active operation (this holds for~start junction, level, and~time). The end of~the~chunk is the~end of~its last active operation (this again holds for~start junction, and~level, end time is the~end time of~the~last operation plus the~release time for~the~resource).
+Each operation $o$ also has its set of~chunk $C_o$, one chunk for~each resource it requires.
+
+The start of~the chunk is the~start of~its first active operation (this holds for~start junction, level, and~time). The end of~the~chunk is the~end of~its last active operation (this again holds for~start junction, and~level, end time of~the~chunk is the~end time of~the~last active operation plus the~release time for~the~resource).
 
 \subsubsection{Procedure}
 We apply the~following procedure for~each train separately and~for~each resource that is used by~the~train:
 \begin{enumerate}
-  \item Get a~set of~all operation for~a~train that are using the~selected resource $r$.
-  \item Create a~\emph{disjoint set} data structure like in~section \ref{sec:junct} for~each operation using resource $r$.
-  \item For~each operation union the~sets of~each predecessor and~each successor with the~operation of~they share the~same resource. These are the~direct merges.
-  \item Iterate over the~pairs of~disjunct sets $\{O_{a},\ O_{b}\}$ and~check if any of~the~operations $y \in O_{b}$ are reachable from any operation in~$x \in O_{a}$, and~vice versa check if any of~the~operations $x \in O_{a}$ are reachable from any operation $y \in O_{b}$. If they are not reachable, union $O_{a}$ and~$O_{b}$. These are the~parallel merges. Note: This is an~iterative procedure, the~following checks to~other chunks are done for~the~whole merged set of~operations, $O_c = O_{a} \cup O_{b}$.
-  \item Assign each chunk $c \gets (r, O_c)$ its set of~operations $O_c$ and~add $c$ to~the~set of~chunks $C_o \gets C_o \cup \{c\}$ for~each operation $o \in C_o$.
+  \item Get a~set of~all operations for~a~train that are using the~selected resource $r$.
+  \item Create a~\emph{disjoint set} data structure like in~section \ref{sec:junct} for~each operation in~this set.
+  \item For~each operation, union the~sets of~each predecessor and~each successor with the~operation if~they share the~same resource. These are the~direct merges.
+  \item Iterate over the~pairs of~disjunct sets $\{O_{a},\ O_{b}\}$ and~check if any operation $y \in O_{b}$ is reachable from any operation $x \in O_{a}$, and~vice versa check if any operation $x \in O_{a}$ is reachable from any operation $y \in O_{b}$. If they are not reachable, union $O_{a}$ and~$O_{b}$. These are the~parallel merges. Note: This is an~iterative procedure, the~following checks to~other chunks are done for~the~whole merged set of~operations, $O_c = O_{a} \cup O_{b}$.
+  \item Assign each chunk $c \gets (r, O_c)$ its set of~operations $O_c$ and~add $c$ to~the~set of~chunks $C_o \gets C_o \cup \{c\}$ for~each operation $o \in O_c$.
 \end{enumerate}
 
 \begin{remark}
-To check the~reachability we use a~simple breath first search (BFS) \cite{moore1959shortest}, from the~starting set of~operations, that has a~cutoff based on~the~maximum level of~the~target operations to~reduce the~search space.
+To check the~reachability we use a~simple breadth-first search (BFS) \cite{moore1959shortest}, from the~starting set of~operations, that has a~cutoff based on~the~maximum level of~the~target operations to~reduce the~search space.
 \end{remark}
 
 
 \section{Link graph}
 \label{sec:link_graph}
-This section describes a~data structure that is used to~generate implication rules for~resource precedence of~chunks. This is useful to~reduce the~number of~required variables and~constraints in~the~following model for~conflict resolution. We also use it to~explore how routing decisions change the~implication rules and~how these decision may cause unwanted effects for~scheduling.
+This section describes a~data structure that is used to~generate implication rules for~resource precedence of~chunks. This is useful to~reduce the~number of~required variables and~constraints in~the~following model for~conflict resolution. We also use it to~explore how routing decisions change the~implication rules and~how these decisions may cause unwanted effects for~scheduling.
 
-While the~implication rules for~resource precedence are discussed in~\cite{MASCIS2002498}, and~\cite{dariano2008improving} shows the~structural implication rules for~train scheduling, the~only relation to~routing is in~\cite{Dubach2025handling} where they only use a~specific set of~conditions.
+While the~implication rules for~resource precedence are discussed in~\textcite{MASCIS2002498}, and~\textcite{dariano2008improving} shows the~structural implication rules for~train scheduling, the~only relation to~routing is in~\textcite{Dubach2025handling} where they only use a~specific set of~conditions.
 
 We try to~broaden the~set of~conditions that can be used to~generate the~structural implication rules by~searching matching pairs of~chunk conflicts using this data structure. Because we are maintaining a~set of~links between chunks, we are calling it \emph{link graph}. 
 
 \subsection{Resource chunk links}
 Resource acquisition is done in~a~blocking manner. This means, that to~transition from operation $x$ to~$y$, we need to~acquire all the~resources $r_{b},\ b \in C_{y} $ for~the~chunks $C_{y}$ of~operation $y$ before we can release the~resources $r_{a},\ a~\in C_{x}$ for~the~chunks $C_x$ of~operation $x$. Because of~this relationship, we say that the~chunks $C_{x}$ are \emph{linked} to~chunks $C_{y}$, so each chunk $a \in C_{x}$ has a~forward link $f = (a,\ b)$ to~each chunk $b \in C_{y}$, and~each chunk $b \in C_{y}$ has a~backward link $g = (b,\ a)$ to~each chunk $a \in C_{x}$.
 
-Each operation $o$ can have multiple chunks, so we create both forward $f = (a, b)$ and~backward $g = (b, a)$ for~each pair of~chunks $(a, b),\ \forall a,\ b \in C_o,\ a~\neq b$, creating what we call a~direct link as~opposed to~the~aforementioned transition link. The set of~all forward links are what we call the~\emph{forward link graph} $\mathcal{F} = (C, F)$, the~set of~all backward links are what we call \emph{backward link graph} $\mathcal{G} = (C, G)$, where vertices are the~chunks and~edges are the~links.
+Each operation $o$ can have multiple chunks, so we create both forward $f = (a, b)$ and~backward $g = (b, a)$ for~each pair of~chunks $(a, b),\ \forall a,\ b \in C_o,\ a\neq b$, creating what we call a~direct link as~opposed to~the~aforementioned transition link. The set of~all forward links are what we call the~\emph{forward link graph} $\mathcal{F} = (C, F)$, the~set of~all backward links are what we call \emph{backward link graph} $\mathcal{G} = (C, G)$, where vertices are the~chunks and~edges are the~links.
 
 \begin{remark}
-We keep track of~forward links $F_c$ and~backward links $G_c$ for~each chunk $c$ separately, so we can have $(c, a) \in F_c$ and~also $(c, a) \in G_c$ at~the~same time, which is the~case for~direct links on~chunks on~the~same operation $o$, where $c, a~\in C_o$. 
+We keep track of~forward links $F_c$ and~backward links $G_c$ for~each chunk $c$ separately, so we can have $(c, a) \in F_c$ and~also $(c, a) \in G_c$ at~the~same time, which is the~case for~direct links on~chunks on~the~same operation $o$, where $c,\ a \in C_o$. 
 \end{remark}
 
-It is important to~note that the~link is active if any of~the~transitions $(x, y)$ that create it are active (both $x$ and~$y$ are active), or it is a~direct link via the~operation $o$ that is active. Figure \ref{fig:chunk_link} shows both a~transition and~a~direct link example.
+It is important to~note that the~link is active if any of~the~transitions $(x,\ y)$ that create it are active (both $x$ and~$y$ are active), or it is a~direct link via the~operation $o$ that is active. Figure \ref{fig:chunk_link} shows both a~transition and~a~direct link example.
 
 \begin{figure}[htbp!]
 \caption{Resource chunk link}
@@ -572,7 +571,7 @@ Without the~information about the~resources before and~after the~conflict, we ca
 
 \subsection{Conflict links}
 \label{sec:conf_links}
-Because the~trains pass the~chunks continuously and~in a~blocking manner, there are structural implication rules for~precedence for~conflicts on~these neighboring chunks. This is discussed in~\cite{dariano2008improving}, and~we paraphrase these rules here.
+Because the~trains pass the~chunks continuously and~in a~blocking manner, there are structural implication rules for~precedence for~conflicts on~these neighboring chunks. This is discussed in~\textcite{dariano2008improving}, and~we paraphrase these rules here.
 
 There are two basic cases, trains going in~the~same (parallel) direction and~trains going in~the~opposite direction. The first case has already been shown in~section \ref{sec:alt_graph}, but we reiterate it here to~show how the~inferred selection in~alternative graphs relates to~the~chunk precedence. The parallel case is shown in~figure \ref{fig:conf_par}.
 
@@ -625,10 +624,10 @@ Conflicts $k_a$ and~$k_b$ can also have an~opposite link if either of~the~follow
 Condition (1) and~(2), and~(3) and~(4), respectively, are symmetric. This is because if chunk $a$ has a~forward link $(a,\ b) \in F_a$, then chunk $b$ always has a~backward link $(b,\ a) \in G_b$. 
 \end{remark}
 
-Using these conditions, we can use BFS or DFS to~find the~entire chain of~conflicts from a~specific conflict, either by~selecting a~subset of~condition for~a~specific direction (parallel or opposite), or any condition to~find linked precedence decisions.
+Using these conditions, we can use BFS or DFS to~find the~entire chain of~conflicts from a~specific conflict, either by~selecting a~subset of~conditions for~a~specific direction (parallel or opposite), or any condition to~find linked precedence decisions.
 
 \subsection{Scheduling effects of~conflict chains}
-Because trains cannot change order within the~conflict chain, we can observe direct effects on~the~possible scheduling of~trains to~each resource. First we cover the~parallel case. For~two trains that have a~parallel resource chain $\Gamma = \{k_a,\ k_b,\ k_c\}$ and~on~resources $a$, $b$, and~$c$, and~operations on~$a$ have a~minimal duration of~2 units, on~$b$ they have 1 unit and~on~$c$ they have 3 units, with the~earliest possible scheduling the~schedule diagram (similar to~Gantt diagram) is shown in~figure \ref{fig:par_schedule}.
+Because trains cannot change order within the~conflict chain, we can observe direct effects on~the~possible scheduling of~trains to~each resource. First, we cover the~parallel case. For~two trains that have a~parallel resource chain $\Gamma = \{k_a,\ k_b,\ k_c\}$ and~on~resources $a$, $b$, and~$c$, and~operations on~$a$ have a~minimal duration of~2 units, on~$b$ they have 1 unit and~on~$c$ they have 3 units, with the~earliest possible scheduling the~schedule diagram (similar to~Gantt diagram) is shown in~figure \ref{fig:par_schedule}.
 
 
 \begin{figure}[htbp!]
@@ -653,7 +652,7 @@ If the~trains had the~earliest possible start for~resource $a$ at~0, then the~se
 \end{figure}
 
 \begin{minipage}{\textwidth}
-Because of~the~no swapping rule, the~opposite conflict chains have a~much bigger impact on~the~scheduling. Figure \ref{fig:opp_schedule} shows the~schedule diagrams for~the~two possible precedence cases. 
+Now, we cover the~opposite case. Because of~the~no swapping rule, the~opposite conflict chains have a~much bigger impact on~the~scheduling. Figure \ref{fig:opp_schedule} shows the~schedule diagrams for~the~two possible precedence cases. 
 \end{minipage}
 
 \begin{figure}[htbp!]
@@ -699,25 +698,25 @@ To choose which routes are selected, we implement a~routing procedure that gradu
 
 
 \subsection{Loss calculation}
-To quantify how good or bad is the~current routing selection, we calculate the~loss $\Lambda_n$ of~each train $n$ as~the~sum of~opposite chain lengths $|\Gamma_k(\Omega)|$ for~each corresponding train conflict $k \in K_{n,\mathrm{close}}$, that is deemed as~close,\footnote{How we select close conflicts is in~the~procedure subsection} based on~the~current route selection $\Omega = \{R_1,\ \dots R_{|\Omega|}\}$,
+To quantify how good or bad is the~current routing selection, we calculate the~loss $\Lambda_n$ of~each train $n$ as~the~sum of~opposite chain lengths $|\Gamma_k(\Omega)|$ for~each corresponding train conflict $k \in K_{n,\mathrm{close}}$, that is deemed close,\footnote{How we select close conflicts is in~the~procedure subsection} based on~the~current route selection $\Omega = \{R_1,\ \dots R_{|\Omega|}\}$,
 
 \begin{equation}
   \Lambda_n(\Omega) = \sum_{k \in K_{n,\mathrm{close}}} |\Gamma_k(\Omega)|.
 \end{equation}
 
-To calculate the~price, loss, of~the~route $\lambda_R$, we have an~augmented selection $\Omega_\mathrm{aug} = \Omega \cup S$ where we add all routes $R \in S$ from section $S$ and~then calculate the~difference in~train loss by~removing the~route $R$.
+To calculate the~loss (price) of~the~route $\lambda_R$, we have an~augmented selection $\Omega_\mathrm{aug} = \Omega \cup S$ where we add all routes $R \in S$ from section $S$ are included, and~then calculate the~difference in~train loss by~removing the~route $R$.
 
 \begin{equation}
   \lambda_R = \Lambda_n(\Omega_\mathrm{aug}) - \Lambda_n(\Omega_\mathrm{aug} \setminus \{R\})
 \end{equation}
 
-Each route loss calculation is done only for~one section $S$ at~a~time, by~changing the~selection of~routes $\Omega$, we change the~conflict chains $\Gamma$ and~thus the~train and~the~route costs.
+Each route loss calculation is done only for~one section $S$ at~a~time, by~changing the~selection of~routes $\Omega$, we change the~conflict chains $\Gamma$ and~thus the~train and~the~route losses.
 
 The main motivation behind this is to~gauge how much does removing the~route break up the~opposite conflict chains for~the~selected conflicts.
 
 \begin{minipage}{\textwidth}
 \subsection{Procedure}
-The routing procedure is done in~following steps:
+The routing procedure is done in~the~following steps:
 \begin{enumerate}
   \item Get the~average level time by~randomized routing. This means that for~each train we simulate passing the~operation graph by~selecting each successor at~random with equal probability. We can get the~level time by~the~earliest possible time for~the~operation by~applying constraints for~the~lower bound for~its start and~minimal duration from its predecessor.
   \item Get the~set of~close conflicts by~checking which chunks have overlapping intervals. This is done while all operations are activated. We also stretch the~interval on~both sides to~get conflicts that are not yet overlapping, but might be when the~scheduling shifts them. We assign these conflicts to~trains for~loss calculation.
@@ -742,28 +741,28 @@ The ILP model for~optimizing a~section $S$ has the~variables $z_R$ for~each rout
 \begin{align}
   \min_{z_R} \sum_{R \in S} \lambda_R\ z_R,\\
   \text{s.t.: }\sum_{R \in \rho_{\mathrm{in}}(j)} z_R - \sum_{R \in \rho_{\mathrm{out}}(j)} z_R &= \begin{cases}
-    1 & \text{if $j$ is a~start (source) junction} \\
-    -1 & \text{if $j$ is an~end (sink) junction} \\
+    -1 & \text{if $j$ is a~start (source) junction} \\
+    1 & \text{if $j$ is an~end (sink) junction} \\
     0 & \text{otherwise}
 \end{cases}, \\
   j \in J_S,&\ z_R \in \{0,\ 1\},
 \end{align}
-where  $J_S$ is the~set of~routing junctions in~the~section $S$, $\rho_{\mathrm{in}}(j)$ is a~set of~incoming routes and~$\rho_{\mathrm{in}}(j)$ is a~set of~outgoing routes for~junction $j$.
+where  $J_S$ is the~set of~routing junctions in~the~section $S$, $\rho_{\mathrm{in}}(j)$ is a~set of~incoming routes and~$\rho_{\mathrm{out}}(j)$ is a~set of~outgoing routes for~junction $j$.
 
-We iterate over sections because they are the~smallest possible blocks of~dependent routes and~the~routing decision of~each section affects the~pricing of~the~following section, and~thus optimizing all sections would be problematic as~their interconnected nature makes it computationally infeasible. While a~better than random order of~sections could be utilized, we have not come up with a~solution that would improve the~loss optimization, compared to~random order of~sections.
+We iterate over sections because they are the~smallest possible sets of~dependent routes and~the~routing decision of~each section can affect the~losses of~all other sections, and~thus optimizing all sections at~the~same time would be problematic, because their interconnected nature makes it computationally infeasible. While a~better than random order of~sections could be utilized, we have not come up with a~solution that would improve the~loss optimization, compared to~random order of~sections.
 
-While we could repeat the~optimization steps or restart it entirely and~try for~a~better solution, in~practice there are no significant improvements in~doing so. This is because most of~the~instances have some symmetry in~their routing options where we might swap operations between trains without impacting the~lengths of~the~chains.
+We could also repeat the~optimization steps or restart the optimization entirely and~try for~a~better solution, but in~practice there are no significant improvements in~doing so. This is because most of~the~instances have some symmetry in~their routing options where we might swap operations between trains without impacting the~lengths of~the~chains.
 
 
 \section{Conflict resolution}
-Because 2 of~the~3 winning solution in~DISPLIB have used a~big-M formulation \cite{wolsey1998integer} for~the~constraints implied by~the~routing and~precedence decisions, we have decided to~try a~different approach based on~a~\emph{path-and-cycle} formulation \cite{lamorgese2019noncompact}\cite{lamorgese2015optimal}, which is similar to~the~LBBD in~\textcite{Dubach2025handling}.
+Because two of~the~three winning solutions in~DISPLIB have used a~big-M formulation \cite{wolsey1998integer} for~the~constraints implied by~the~routing and~precedence decisions, we have decided to~try a~different approach based on~a~\emph{path-and-cycle} formulation \cite{lamorgese2019noncompact}\cite{lamorgese2015optimal}, which is similar to~the~LBBD in~\textcite{Dubach2025handling}.
 
 This approach does not use the~big-M constraints that are often problematic \cite{pineda2019not}\cite{codato2006combinatorial}. Choosing the~value of~the~M greatly influences the~performance of~the~optimizer, values that are too small cutoff feasible solutions, leading to~an~incorrect model, and~values that are too big weaken the~LP relaxation, which then requires more nodes in~the~branch-and-bound search to~arrive at~an~integer solution, and~can even cause numerical instability.
 
-Instead, we use an~event graph which includes the~selected alternative edges from precedence decision, and~we add feasibility cuts to~prevent cycles and~to~enforce lower-bound on~delays based the~current precedence variables via the~critical path. This eliminates the~need for~big-M constraints, as~the~highest coefficients are the~lower-bounds for~the~delays. The main drawback for~this approach is that we may need to~add an~exponentially growing number of~cuts to~remove the~infeasible solutions. This is why we use the~link graph to~group these precedence decisions into chains to~reduce the~required number of~variables and~cycle cuts.
+Instead, we use an~event graph which includes the~selected alternative edges from precedence decision, and~we add feasibility cuts to~prevent cycles and~to~enforce a~conditional lower bound on~delays based on~the~current precedence variables via the~critical path. This eliminates the~need for~big-M constraints, as~the~highest coefficients are the~lower-bounds for~the~delays. The main drawback for~this approach is that we may need to~add an~exponentially growing number of~cuts to~remove the~infeasible solutions. This is why we use the~link graph to~group these precedence decisions into chains to~reduce the~required number of~variables and~cycle cuts.
 
 \subsection{Event graph}
-To generate the~times of~each level, we employ an~event graph, where each level corresponds to~one vertex of~the~graph (plus the~origin). We add one edge for~each active operation from its starting level to~its ending level with the~weight equal to~the~minimum duration of~the~operation. We also add one edge for~each conflict based on~the~current value of~the~precedence variable from the~end of~the~first chunk to~the~start of~the~second chunk with the~weight equal to~its release time. Figures \ref{fig:event_cycle} and~\ref{fig:event_path} show such event graph with both operation and~precedence edges.
+To generate the~times of~each level and the~chunk time intervals, we employ an~event graph, where each level corresponds to~one vertex of~the~graph (plus the~origin). We add one edge for~each active operation from its starting level to~its ending level with the~weight equal to~the~minimum duration of~the~operation. We also add one edge for~each conflict based on~the~current value of~the~precedence variable from the~end of~the~first chunk to~the~start of~the~second chunk with the~weight equal to~its release time. Figures \ref{fig:event_cycle} and~\ref{fig:event_path} show such event graph with both operation and~precedence edges.
 
 \newpage
 \subsection{Cycle cuts}
@@ -786,7 +785,7 @@ Because we cannot remove the~operation edges (we are working with fixed routes),
 forcing any of~the~variables to~change their value, preventing the~cycle from forming. For~our example, $\Pi_C = \{p_1,\ p_2,\ \bar{p}_3\},\ \bar{p}_3=1-p_3$.
 
 \subsection{Path cuts}
-For each active operation with an~objective $o \in O_{a,\Delta}$, we have delay variable $\Delta_o$. The MILP model is trying to~minimize these, but the~event graph sets the~earliest time $t_o$ based on~its critical path. This creates a~lower-bound for~the~$\Delta_o$ variable based on~the~current precedence values. Figure \ref{fig:event_path} shows such critical path for~$s$, generating time $\mathrm{T}(s)$.
+For each active operation with an~objective $o \in O_{a,\Delta}$, we have delay variable $\Delta_o$. The MILP model is trying to~minimize these, but the~event graph sets the~earliest time $t_o$ based on~its critical path. This creates a~conditional lower-bound for~the~delay variable $\Delta_o$ based on~the~current precedence values. Figure \ref{fig:event_path} shows such critical path for~$s$, generating time $\mathrm{T}(s)$.
 
 \begin{figure}[htbp!]
 \caption{Event graph - critical path}
@@ -802,9 +801,9 @@ We can enforce the~conditional lower-bound of~delay $\Delta_o$, if it is violate
 \label{eq:path_cut}
   \Big(\sum_{p \in \Pi_{P}} p - |\Pi_P| + 1\Big)\Big(\mathrm{T}(s) - \bar{t}_o\Big) \leq \Delta_o,
 \end{equation}
-where $\Pi_P$ is the~set of~precedence variables on~the~critical path, $\mathrm{T}(s)$ is the~time of~the~starting level for~$o$ (in the~current graph), and~$\bar{t}_o$ is the~objective threshold. This cut is active only when all the~precedence variable $\Pi_{P}$ along it are the~same. For~our example in~figure \ref{fig:event_path}, only $p_1$ and~$p_2$ are in~the~set $\Pi_P = \{p_1,\ p_2\}$, the~third precedence variable is not on~the~critical path.
+where $\Pi_P$ is the~set of~precedence variables on~the~critical path, $\mathrm{T}(s)$ is the~time of~the~starting level for~$o$ (in the~current graph), and~$\bar{t}_o$ is the~objective threshold. This cut is active only when all the~precedence variable $\Pi_{P}$ along it are active. For~our example in~figure \ref{fig:event_path}, only $p_1$ and~$p_2$ are in~the~set $\Pi_P = \{p_1,\ p_2\}$; the~third precedence variable is not on~the~critical path.
 
-If the~objective is binary, thus $\Delta_o$ is binary, indicating that $t_o > \bar{t}_o$, then we just add an~implication cut,
+If the~objective is stepwise, thus $\Delta_o$ is binary, indicating that $t_o > \bar{t}_o$, then we just add an~implication cut,
 \begin{equation}
 \label{eq:impl_cut}
   \sum_{p \in \Pi_{P}} p - |\Pi_P| + 1 \leq \Delta_o.
@@ -813,7 +812,7 @@ If the~objective is binary, thus $\Delta_o$ is binary, indicating that $t_o > \b
 \subsection{Conflict discovery}
 We iteratively discover the~conflicts by~finding the~first overlapping pair of~chunks on~the~same resources. We then use the~link graph to~find the~entire chain $\Gamma$ for~the~discovered conflict and~use one binary precedence variable $p_\Gamma \in \{0,\ 1\}$ for~all the~conflicts in~the~chain, $p_\Gamma = p_k,\ \forall k \in \Gamma$.
 
-Using the~chain reduces the~number of~necessary variables and~cycle constraints, because for~a~chain of~2 conflicts $a$ and~$b$, we would need 2 variables $p_a$ and~$p_b$ and~2 cycle cuts $p_a - p_b \leq 0$ and~$p_b - p_a \leq 0$. So for~each connection in~the~chain, we reduce the~number of~necessary variables by~one, and~the~number of~necessary cycle constraints by~two.
+Using the~chain reduces the~number of~necessary variables and~cycle constraints, because for~a~chain of~two conflicts $a$ and~$b$, we would need two variables $p_a$ and~$p_b$ and~two cycle cuts $p_a - p_b \leq 0$ and~$p_b - p_a \leq 0$. So for~each connection in~the~chain, we reduce the~number of~necessary variables by~one, and~the~number of~necessary cycle constraints by~two.
 
 An additional advantage is that using the~conflict chain prevents resource swaps, as~only possible swap between two pairs of chunks must have their corresponding conflicts on~the~same conflict chain.
 
